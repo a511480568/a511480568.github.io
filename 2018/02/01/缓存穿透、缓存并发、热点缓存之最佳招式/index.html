@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>眺望远方</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="缓存穿透、缓存并发、热点缓存之最佳招式 一、前言我们在用缓存的时候，不管是Redis或者Memcached，基本上会通用遇到以下三个问题：  缓存穿透 缓存并发 缓存失效 缓存穿透   上面三个图会有什么问题呢？ 我们在项目中使用缓存通常都是先检查缓存中是否存在，如果存在直接返回缓存内容，如果不存在就直接查询数据库然后再缓存查询结果返回。这个时候如果我们查询的某一个数据在缓存中一直不存在，就会造成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="眺望远方">
+<meta property="og:url" content="http://yoursite.com/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta property="og:description" content="缓存穿透、缓存并发、热点缓存之最佳招式 一、前言我们在用缓存的时候，不管是Redis或者Memcached，基本上会通用遇到以下三个问题：  缓存穿透 缓存并发 缓存失效 缓存穿透   上面三个图会有什么问题呢？ 我们在项目中使用缓存通常都是先检查缓存中是否存在，如果存在直接返回缓存内容，如果不存在就直接查询数据库然后再缓存查询结果返回。这个时候如果我们查询的某一个数据在缓存中一直不存在，就会造成">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/wechat_img1.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/wechat_img2.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/wechat_img3.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/wechat_img4.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/wechat_img5.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/wechat_img6.jpg?raw=true">
+<meta property="og:updated_time" content="2018-01-31T22:10:28.192Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="眺望远方">
+<meta name="twitter:description" content="缓存穿透、缓存并发、热点缓存之最佳招式 一、前言我们在用缓存的时候，不管是Redis或者Memcached，基本上会通用遇到以下三个问题：  缓存穿透 缓存并发 缓存失效 缓存穿透   上面三个图会有什么问题呢？ 我们在项目中使用缓存通常都是先检查缓存中是否存在，如果存在直接返回缓存内容，如果不存在就直接查询数据库然后再缓存查询结果返回。这个时候如果我们查询的某一个数据在缓存中一直不存在，就会造成">
+<meta name="twitter:image" content="https://github.com/a511480568/image/blob/master/wechat_img1.jpg?raw=true">
+  
+    <link rel="alternative" href="/atom.xml" title="眺望远方" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/head.jpg" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Yashon</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/Home">博客首页</a></li>
+                        
+                            <li><a href="/works">作品展示</a></li>
+                        
+                            <li><a href="/about">留言打卡</a></li>
+                        
+                            <li><a href="/FrontEndGuide">前端导航</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                            
+                                <a class="fl weibo" target="_blank" href="#" title="weibo">weibo</a>
+                            
+                                <a class="fl google" target="_blank" href="#" title="google">google</a>
+                            
+                                <a class="fl twitter" target="_blank" href="#" title="twitter">twitter</a>
+                            
+                                <a class="fl linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://luuman.github.io/">name</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Yashon</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/head.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Yashon</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/Home">博客首页</a></li>
+                
+                    <li><a href="/works">作品展示</a></li>
+                
+                    <li><a href="/about">留言打卡</a></li>
+                
+                    <li><a href="/FrontEndGuide">前端导航</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                    
+                        <a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+                    
+                        <a class="google" target="_blank" href="#" title="google">google</a>
+                    
+                        <a class="twitter" target="_blank" href="#" title="twitter">twitter</a>
+                    
+                        <a class="linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-缓存穿透、缓存并发、热点缓存之最佳招式" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" class="article-date">
+      <time datetime="2018-01-31T22:10:28.122Z" itemprop="datePublished">2018-02-01</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>缓存穿透、缓存并发、热点缓存之最佳招式</p>
+<h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>我们在用缓存的时候，不管是Redis或者Memcached，基本上会通用遇到以下三个问题：</p>
+<ul>
+<li>缓存穿透</li>
+<li>缓存并发</li>
+<li><p>缓存失效</p>
+<h5 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a><font color="green">缓存穿透<font></font></font></h5><p><img src="https://github.com/a511480568/image/blob/master/wechat_img1.jpg?raw=true" alt="有个业务逻辑"><br><img src="https://github.com/a511480568/image/blob/master/wechat_img2.jpg?raw=true" alt="管理后台业务"><br><img src="https://github.com/a511480568/image/blob/master/wechat_img3.jpg?raw=true" alt="管理后台业务逻辑变更为"></p>
+</li>
+</ul>
+<p>上面三个图会有什么问题呢？</p>
+<p>我们在项目中使用缓存通常都是先检查缓存中是否存在，如果存在直接返回缓存内容，如果不存在就直接查询数据库然后再缓存查询结果返回。这个时候如果我们查询的某一个数据在缓存中一直不存在，就会造成每一次请求都查询DB，这样缓存就失去了意义，在流量大时，可能DB就挂掉了。</p>
+<p>要是有人利用不存在的key频繁攻击我们的应用，这就是漏洞。</p>
+<p>有一个比较巧妙的作法是，可以将这个不存在的key预先设定一个值:比如，”key” , “&amp;&amp;”</p>
+<p>在返回这个&amp;&amp;值的时候，我们的应用就可以认为这是不存在的key，那我们的应用就可以决定是否继续等待继续访问，还是放弃掉这次操作。如果继续等待访问，过一个时间轮询点后，再次请求这个key，如果取到的值不再是&amp;&amp;，则可以认为这时候key有值了，从而避免了透传到数据库，从而把大量的类似请求挡在了缓存之中。</p>
+<h5 id="缓存并发"><a href="#缓存并发" class="headerlink" title="缓存并发"></a><font color="green">缓存并发<font></font></font></h5><p>有时候如果网站并发访问高，一个缓存如果失效，可能出现多个进程同时查询DB，同时设置缓存的情况，如果并发确实很大，这也可能造成DB压力过大，还有缓存频繁更新的问题。</p>
+<p>我现在的想法是对缓存查询加锁，如果KEY不存在，就加锁，然后查DB入缓存，然后解锁；其他进程如果发现有锁就等待，然后等解锁后返回数据或者进入DB查询。</p>
+<p>这种情况和刚才说的预先设定值问题有些类似，只不过利用锁的方式，会造成部分请求等待。</p>
+<h5 id="缓存失效"><a href="#缓存失效" class="headerlink" title="缓存失效"></a><font color="green">缓存失效<font></font></font></h5><p>引起这个问题的主要原因还是高并发的时候，平时我们设定一个缓存的过期时间时，可能有一些会设置1分钟啊，5分钟这些，并发很高时可能会出在某一个时间同时生成了很多的缓存，并且过期时间都一样，这个时候就可能引发一当过期时间到后，这些缓存同时失效，请求全部转发到DB，DB可能会压力过重。</p>
+<p>那如何解决这些问题呢？</p>
+<p>其中的一个简单方案就时讲缓存失效时间分散开，比如我们可以在原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。</p>
+<p>我们讨论的第二个问题时针对同一个缓存，第三个问题时针对很多缓存。</p>
+<p>总结来看：</p>
+<ol>
+<li>缓存穿透：查询一个必然不存在的数据。比如文章表，查询一个不存在的id，每次都会访问DB，如果有人恶意破坏，很可能直接对DB造成影响。</li>
+<li>缓存失效：如果缓存集中在一段时间内失效，DB的压力凸显。这个没有完美解决办法，但可以分析用户行为，尽量让失效时间点均匀分布。</li>
+</ol>
+<h5 id="问题汇总"><a href="#问题汇总" class="headerlink" title="问题汇总"></a><font color="green">问题汇总<font></font></font></h5><h6 id="emsp-问题1"><a href="#emsp-问题1" class="headerlink" title="&emsp;问题1:"></a><font color="green">&emsp;问题1:<font></font></font></h6><p>如何解决DB和缓存一致性问题？</p>
+<p>答：当修改了数据库后，有没有及时修改缓存。这种问题，以前有过实践，修改数据库成功，而修改缓存失败的情况，最主要就是缓存服务器挂了。而因为网络问题引起的没有及时更新，可以通过重试机制来解决。而缓存服务器挂了，请求首先自然也就无法到达，从而直接访问到数据库。那么我们在修改数据库后，无法修改缓存，这时候可以将这条数据放到数据库中，同时启动一个异步任务定时去检测缓存服务器是否连接成功，一旦连接成功则从数据库中按顺序取出修改数据，依次进行缓存最新值的修改。</p>
+<h6 id="emsp-问题2"><a href="#emsp-问题2" class="headerlink" title="&emsp;问题2:"></a><font color="green">&emsp;问题2:<font></font></font></h6><p>问下缓存穿透那块！例如，一个用户查询文章，通过ID查询，按照之前说的，是将缓存的KEY预先设置一个值，，如果通过ID插过来，发现是预先设定的一个值，比如说是“&amp;&amp;”，那之后的继续等待访问是什么意思，这个ID什么时候会真正被附上用户所需要的值呢？</p>
+<p>答：我刚说的主要是咱们常用的后面配置，前台获取的场景。前台无法获取相应的key，则等待，或者放弃。当在后台配置界面上配置了相关key和value之后，那么以前的key &amp;&amp;也自然会被替换掉。你说的那种情况，自然也应该会有一个进程会在某一个时刻，在缓存中设置这个ID，再有新的请求到达的时候，就会获取到最新的ID和value。</p>
+<h6 id="emsp-问题3"><a href="#emsp-问题3" class="headerlink" title="&emsp;问题3:"></a><font color="green">&emsp;问题3:<font></font></font></h6><p>其实用redis的话，那天看到一个不错的例子，双key，有一个当时生成的一个附属key来标识数据修改到期时间，然后快到的时候去重新加载数据，如果觉得key多可以把结束时间放到主key中，附属key起到锁的功能。</p>
+<p>答：这种方案，之前我们实践过。这种方案会产生双份数据，而且需要同时控制附属key与key之间的关系，操作上有一定复杂度。</p>
+<h6 id="emsp-问题4"><a href="#emsp-问题4" class="headerlink" title="&emsp;问题4:"></a><font color="green">&emsp;问题4:<font></font></font></h6><p>多级缓存是什么概念呢？</p>
+<p>答：多级缓存就像我今天之前给大家发的文章里面提到了，将ehcache与redis做二级缓存，就像我之前写的文章 <a href="http://www.jianshu.com/p/2cd6ad416a5a" target="_blank" rel="noopener">http://www.jianshu.com/p/2cd6ad416a5a</a> 提到过的。但同样会存在一致性问题，如果我们需要强一致性的话，缓存与数据库同步是会存在时间差的，所以我们在具体开发的过程中，一定要根据场景来具体分析，二级缓存更多的解决是，缓存穿透与程序的健壮性，当集中式缓存出现问题的时候，我们的应用能够继续运行。</p>
+<h3 id="二、缓存穿透与并发方案"><a href="#二、缓存穿透与并发方案" class="headerlink" title="二、缓存穿透与并发方案"></a>二、缓存穿透与并发方案</h3><p>上文中介绍了关于缓存穿透、并发的一些常用思路，但是没有明确一些思路的使用场景，下面继续深入探讨。相信不少朋友之前看过很多类似的文章，但是归根结底就是二个问题：</p>
+<ul>
+<li>如何解决穿透</li>
+<li>如何解决并发</li>
+</ul>
+<p>当并发较高的时候，其实我是不建议使用缓存过期这个策略的，我更希望缓存一直存在，通过后台系统来更新缓存系统中的数据达到数据的一致性目的，有的朋友可能会质疑，如果缓存系统挂了怎么办，这样数据库更新了但是缓存没有更新，没有达到一致性的状态。</p>
+<font color="red">解决问题的思路是：</font>
+
+<p>如果缓存是因为网络问题没有更新成功数据，那么建议重试几次，如果依然没有更新成功则认为缓存系统出错不可用，这时候客户端会将数据的KEY插入到消息系统中，消息系统可以过滤相同的KEY，只需保证消息系统不存在相同的KEY，当缓存系统恢复可用的时候，依次从mq中取出KEY值然后从数据库中读取最新的数据更新缓存。注意：更新缓存之前，缓存中依然有旧数据，所以不会造成缓存穿透。</p>
+<p>下图展示了整个思路的过程：<br><img src="https://github.com/a511480568/image/blob/master/wechat_img4.jpg?raw=true" alt="ff"><br>看完上面的方案以后，又会有不少朋友提出疑问，如果我是第一次使用缓存或者缓存中暂时没有我需要的数据，那又该如何处理呢？</p>
+<font color="red">解决问题的思路是：</font>
+
+<p>在这种场景下，客户端从缓存中根据KEY读取数据，如果读到了数据则流程结束，如果没有读到数据（可能会有多个并发都没有读到数据），这时候使用缓存系统中的setNX方法设置一个值（这种方法类似加个锁），没有设置成功的请求则sleep一段时间，设置成功的请求读取数据库获取值，如果获取到则更新缓存，流程结束，之前sleep的请求这时候唤醒后直接再从缓存中读取数据，此时流程结束。</p>
+<p>在看完这个流程后，我想这里面会有一个漏洞，如果数据库中没有我们需要的数据该怎么处理，如果不处理则请求会造成死循环，不断的在缓存和数据库中查询，这时候我们会沿用我之前文章中的如果没有读到数据则往缓存中插入一个NULL字符串的思路，这样其他请求直接就可以根据“NULL”进行处理，直到后台系统在数据库成功插入数据后同步更新清理NULL数据和更新缓存。</p>
+<p>流程图如下所示：<br><img src="https://github.com/a511480568/image/blob/master/wechat_img5.jpg?raw=true" alt="ff"></p>
+<h6 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h6><p>在实际工作中，我们往往将上面二个方案组合使用才能达到最佳效果，虽然第二种方案也会造成请求阻塞，但是只是在第一次使用或者缓存暂时没有数据的情况下才会产生，在生产中经过检验在TPS没有上万的情况下是不会造成问题的。</p>
+<h3 id="三、热点缓存解决方案"><a href="#三、热点缓存解决方案" class="headerlink" title="三、热点缓存解决方案"></a>三、热点缓存解决方案</h3><ul>
+<li>缓存使用背景：</li>
+</ul>
+<p>我们拿用户中心的一个案例来说明：<br>每个用户都会首先获取自己的用户信息，然后再进行其他相关的操作，有可能会有如下一些场景情况：</p>
+<blockquote>
+<p>会有大量相同用户重复访问该项目。</p>
+<p>会有同一用户频繁访问同一模块。</p>
+</blockquote>
+<ul>
+<li>思路解析:</li>
+</ul>
+<blockquote>
+<p>因为用户本身是不固定的而且用户数量也有几百万尤其上千万，我们不可能把所有的用户信息全部缓存起来，通过第一个场景情况可以看到一些规律，那就是有大量的相同用户重复访问，但是究竟是哪些用户重复访问我们也并不知道。</p>
+<p>如果有一个用户频繁刷新读取项目，那么对数据库本身也会造成较大压力，当然我们也会有相关的保护机制来确实恶意攻击，可以从前端控制，也可以有采黑名单等机制，这里不在赘述。如果用缓存的话，我们又该如何控制同一用户繁重读取用户信息呢。</p>
+</blockquote>
+<p>请看下图：<br><img src="https://github.com/a511480568/image/blob/master/wechat_img6.jpg?raw=true" alt=""></p>
+<p>我们会通过缓存系统做一个排序队列，比如1000个用户，系统会根据用户的访问时间更新用户信息的时间，越是最近访问的用户排名越排前，系统会定期过滤掉排名最后的200个用户，然后再从数据库中随机取出200个用户加入队列，这样请求每次到达的时候，会先从队列中获取用户信息，如果命中则根据userId，再从另一个缓存数据结构中读取用户信息，如果没有命中则说明该用户请求频率不高。</p>
+<p>这篇文章转载于：<a href="https://mp.weixin.qq.com/s/62KJ2mSTGoUTPsq0RjU7lg" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/62KJ2mSTGoUTPsq0RjU7lg</a></p>
+<p>如有侵权，请告知。</p>
+
+      
+      
+        <div class="page-reward">
+          <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang">赏</a></p>
+          <div class="hide_box"></div>
+          <div class="shang_box">
+            <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
+            <div class="shang_tit">
+              <p>纯属好玩</p>
+            </div>
+            <div class="shang_payimg">
+              <img src="/img/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+            </div>
+              <div class="pay_explain">扫码打赏，你说多少就多少</div>
+            <div class="shang_payselect">
+              
+                <div class="pay_item checked" data-id="alipay">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/alipay.png" alt="支付宝" /></span>
+                </div>
+              
+              
+                <div class="pay_item" data-id="wechat">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/weixin.png" alt="微信" /></span>
+                </div>
+              
+            </div>
+            <div class="shang_info">
+              <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+        <script type="text/javascript">
+          $(".pay_item").click(function(){
+            $(this).addClass('checked').siblings('.pay_item').removeClass('checked');
+            var dataid=$(this).attr('data-id');
+            $(".shang_payimg img").attr("src","/img/"+dataid+"img.jpg");
+            $("#shang_pay_txt").text(dataid=="alipay"?"支付宝":"微信");
+          });
+          function dashangToggle(){
+            
+            $(".hide_box").fadeToggle();
+            $(".shang_box").fadeToggle();
+          }
+        </script>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/"></a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Yashon 的个人博客">Yashon</a></p>
+        <p><span>发布时间:</span>2018年02月01日 - 06时10分</p>
+        <p><span>最后更新:</span>2018年02月01日 - 06时10分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" title="">http://yoursite.com/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/　　作者: Yashon" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2018/02/01/Redis的RDB持久化配置/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/02/01/redis持久化/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、前言"><span class="toc-number">1.</span> <span class="toc-text">一、前言</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#缓存穿透"><span class="toc-number">1.0.1.</span> <span class="toc-text">缓存穿透</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#缓存并发"><span class="toc-number">1.0.2.</span> <span class="toc-text">缓存并发</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#缓存失效"><span class="toc-number">1.0.3.</span> <span class="toc-text">缓存失效</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#问题汇总"><span class="toc-number">1.0.4.</span> <span class="toc-text">问题汇总</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-问题1"><span class="toc-number">1.0.4.1.</span> <span class="toc-text"> 问题1:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-问题2"><span class="toc-number">1.0.4.2.</span> <span class="toc-text"> 问题2:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-问题3"><span class="toc-number">1.0.4.3.</span> <span class="toc-text"> 问题3:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-问题4"><span class="toc-number">1.0.4.4.</span> <span class="toc-text"> 问题4:</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、缓存穿透与并发方案"><span class="toc-number">2.</span> <span class="toc-text">二、缓存穿透与并发方案</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#总结："><span class="toc-number">2.0.0.1.</span> <span class="toc-text">总结：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、热点缓存解决方案"><span class="toc-number">3.</span> <span class="toc-text">三、热点缓存解决方案</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <div id="gitments"></div>
+<script src="/js/gitment.browser.js"></script>
+<script>
+    var gitment = new Gitment({
+      id: window.location.pathname,
+      owner: 'luuman',
+      repo: 'luuman.github.io',
+      oauth: {
+        client_id: '',
+        client_secret: '',
+      },
+    })
+    gitment.render('gitments')
+</script>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/02/01/Redis的RDB持久化配置/" title="上一篇: ">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2018/02/01/redis持久化/" title="下一篇: ">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis中的哨兵架构的相关知识/">redis中的哨兵架构的相关知识</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/">redis replication以及master持久化对主从架构的安全意义</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis主从架构搭建（一主一从）/">redis主从架构搭建（一主一从）</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis数据备份方案/">redis数据备份方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis的AOF持久化/">redis的AOF持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/手撕HashMap/">手撕HashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/Redis的RDB持久化配置/">Redis的RDB持久化配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/">缓存穿透、缓存并发、热点缓存之最佳招式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis持久化/">redis持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/31/Linux中安装redis及开发和生产启动/">Linux中安装redis及开发和生产启动</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/27/hello-world/">Hello World</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 Yashon
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> by luuman
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >海贼到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

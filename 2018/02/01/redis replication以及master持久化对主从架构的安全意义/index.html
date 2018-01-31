@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>眺望远方</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="redis replication以及master持久化对主从架构的安全意义 由于单机的redis一般只能支撑几万的QPS，如果想要支撑10万+的QPS，就需要做主从架构来支撑。 redis replication 基本原理基本原理如下： redis replication核心机制 redis采用异步方式复制数据到slave节点，不过redis2.8开始，slave node会周期性的确认自己每次">
+<meta property="og:type" content="article">
+<meta property="og:title" content="眺望远方">
+<meta property="og:url" content="http://yoursite.com/2018/02/01/redis replication以及master持久化对主从架构的安全意义/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta property="og:description" content="redis replication以及master持久化对主从架构的安全意义 由于单机的redis一般只能支撑几万的QPS，如果想要支撑10万+的QPS，就需要做主从架构来支撑。 redis replication 基本原理基本原理如下： redis replication核心机制 redis采用异步方式复制数据到slave节点，不过redis2.8开始，slave node会周期性的确认自己每次">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/%E5%A4%8D%E5%88%B6%E7%9A%84%E5%AE%8C%E6%95%B4%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png?raw=true">
+<meta property="og:updated_time" content="2018-01-31T22:12:09.995Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="眺望远方">
+<meta name="twitter:description" content="redis replication以及master持久化对主从架构的安全意义 由于单机的redis一般只能支撑几万的QPS，如果想要支撑10万+的QPS，就需要做主从架构来支撑。 redis replication 基本原理基本原理如下： redis replication核心机制 redis采用异步方式复制数据到slave节点，不过redis2.8开始，slave node会周期性的确认自己每次">
+<meta name="twitter:image" content="https://github.com/a511480568/image/blob/master/%E5%A4%8D%E5%88%B6%E7%9A%84%E5%AE%8C%E6%95%B4%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png?raw=true">
+  
+    <link rel="alternative" href="/atom.xml" title="眺望远方" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/head.jpg" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Yashon</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/Home">博客首页</a></li>
+                        
+                            <li><a href="/works">作品展示</a></li>
+                        
+                            <li><a href="/about">留言打卡</a></li>
+                        
+                            <li><a href="/FrontEndGuide">前端导航</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                            
+                                <a class="fl weibo" target="_blank" href="#" title="weibo">weibo</a>
+                            
+                                <a class="fl google" target="_blank" href="#" title="google">google</a>
+                            
+                                <a class="fl twitter" target="_blank" href="#" title="twitter">twitter</a>
+                            
+                                <a class="fl linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://luuman.github.io/">name</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Yashon</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/head.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Yashon</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/Home">博客首页</a></li>
+                
+                    <li><a href="/works">作品展示</a></li>
+                
+                    <li><a href="/about">留言打卡</a></li>
+                
+                    <li><a href="/FrontEndGuide">前端导航</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                    
+                        <a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+                    
+                        <a class="google" target="_blank" href="#" title="google">google</a>
+                    
+                        <a class="twitter" target="_blank" href="#" title="twitter">twitter</a>
+                    
+                        <a class="linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-redis replication以及master持久化对主从架构的安全意义" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/" class="article-date">
+      <time datetime="2018-01-31T22:12:09.932Z" itemprop="datePublished">2018-02-01</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>redis replication以及master持久化对主从架构的安全意义</p>
+<p>由于单机的redis一般只能支撑几万的QPS，如果想要支撑10万+的QPS，就需要做主从架构来支撑。</p>
+<h5 id="redis-replication-基本原理"><a href="#redis-replication-基本原理" class="headerlink" title="redis replication 基本原理"></a>redis replication 基本原理</h5><p>基本原理如下：</p>
+<h4 id="redis-replication核心机制"><a href="#redis-replication核心机制" class="headerlink" title="redis replication核心机制"></a>redis replication核心机制</h4><ol>
+<li><p>redis采用异步方式复制数据到slave节点，不过redis2.8开始，slave node会周期性的确认自己每次复制的数据量</p>
+</li>
+<li><p>一个master node可以配置多个slave node</p>
+</li>
+<li><p>slave node也可以连接其他的slave node</p>
+</li>
+<li><p>slave node做复制的时候是不会block master node的正常工作的</p>
+</li>
+<li><p>slave node在复制的时候也不会block自己的查询工作的，它会旧的数据集来提供服务，但是复制完成的时候，需要删除旧数据集，加载新数据集，这个时候就会暂停对外服务了</p>
+</li>
+<li><p>slave node主要用来进行横向扩容，做读写分离，扩容的slave node可以用来提高吞吐量</p>
+</li>
+</ol>
+<h4 id="master的持久化对主从架构的安全意义"><a href="#master的持久化对主从架构的安全意义" class="headerlink" title="master的持久化对主从架构的安全意义"></a>master的持久化对主从架构的安全意义</h4><ul>
+<li><p>如果采用了主从架构，那么建议开启master node的持久化</p>
+</li>
+<li><p>不建议用slave node作为master node的数据热备，因为那样的话，如果你关闭master的持久化，可能在master宕机重启的时候数据是空的，然后master node复制数据到slave node，那么slave node的数据也被清空了</p>
+</li>
+<li><p>即使采用了高可用机制（哨兵），slave node可以自动接管master node，但是也可能sentinal还没有检测到master failure，master node就自动重启了，还是会有上述导致清空slaver node数据的风险</p>
+</li>
+</ul>
+<h4 id="redis主从架构复制的流程"><a href="#redis主从架构复制的流程" class="headerlink" title="redis主从架构复制的流程"></a>redis主从架构复制的流程</h4><ol>
+<li><p>slave node启动，仅仅保存master node的信息，包括master node的host和IP，但是复制流程还没开始</p>
+</li>
+<li><p>slave node内部有个定时任务，每秒检查是否有新的master node要连接和复制，如果发现，就跟master node建立socket连接</p>
+</li>
+<li><p>slave node发送ping命令给master node</p>
+</li>
+<li><p>口令认证，如果master设置了requirepass，那么slave node必须发送slaveauth的口令过去认证</p>
+</li>
+<li><p>master node 第一次进行全量复制，将所有数据发送给slave node</p>
+</li>
+<li><p>master node后续持续将写命令，使用异步复制的方式发送给slave node</p>
+</li>
+</ol>
+<p>如下图：</p>
+<p><img src="https://github.com/a511480568/image/blob/master/%E5%A4%8D%E5%88%B6%E7%9A%84%E5%AE%8C%E6%95%B4%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png?raw=true" alt="redis主从架构复制流程图"></p>
+<p><strong>全量复制</strong></p>
+<ul>
+<li><p>master执行bgsave，在本地生成一份rdb快照文件</p>
+</li>
+<li><p>master node将rdb快照文件发送给salve node，如果rdb复制时间超过60秒（repl-timeout），那么slave node就会认为复制失败，可以适当调节大这个参数</p>
+</li>
+<li><p>对于千兆网卡的机器，一般每秒传输100MB，6G文件，很可能超过60s</p>
+</li>
+<li><p>master node在生成rdb时，会将所有新的写命令缓存在内存中，在salve node保存了rdb之后，再将新的写命令复制给salve node</p>
+</li>
+<li><p>client-output-buffer-limit slave 256MB 64MB 60，如果在复制期间，内存缓冲区持续消耗超过64MB，或者一次性超过256MB，那么停止复制，复制失败</p>
+</li>
+<li><p>slave node接收到rdb之后，清空自己的旧数据，然后重新加载rdb到自己的内存中，同时基于旧的数据版本对外提供服务</p>
+</li>
+<li><p>如果slave node开启了AOF，那么会立即执行BGREWRITEAOF，重写AOF</p>
+</li>
+</ul>
+<p><strong>增量复制</strong></p>
+<ul>
+<li><p>如果全量复制过程中，master-slave网络连接断掉，那么salve重新连接master时，会触发增量复制（使用run_id，offset等判断）</p>
+</li>
+<li><p>master直接从自己的backlog中获取部分丢失的数据，发送给slave node，默认backlog就是1MB</p>
+</li>
+<li><p>msater就是根据slave发送的psync中的offset来从backlog中获取数据的</p>
+</li>
+</ul>
+<p><strong>heartbeat</strong></p>
+<p>主从节点互相都会发送heartbeat信息:master默认每隔10秒发送一次heartbeat，salve node每隔1秒发送一个heartbeat</p>
+<p><strong>异步复制</strong></p>
+<p>master每次接收到写命令之后，现在内部写入数据，然后异步发送给slave node</p>
+
+      
+      
+        <div class="page-reward">
+          <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang">赏</a></p>
+          <div class="hide_box"></div>
+          <div class="shang_box">
+            <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
+            <div class="shang_tit">
+              <p>纯属好玩</p>
+            </div>
+            <div class="shang_payimg">
+              <img src="/img/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+            </div>
+              <div class="pay_explain">扫码打赏，你说多少就多少</div>
+            <div class="shang_payselect">
+              
+                <div class="pay_item checked" data-id="alipay">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/alipay.png" alt="支付宝" /></span>
+                </div>
+              
+              
+                <div class="pay_item" data-id="wechat">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/weixin.png" alt="微信" /></span>
+                </div>
+              
+            </div>
+            <div class="shang_info">
+              <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+        <script type="text/javascript">
+          $(".pay_item").click(function(){
+            $(this).addClass('checked').siblings('.pay_item').removeClass('checked');
+            var dataid=$(this).attr('data-id');
+            $(".shang_payimg img").attr("src","/img/"+dataid+"img.jpg");
+            $("#shang_pay_txt").text(dataid=="alipay"?"支付宝":"微信");
+          });
+          function dashangToggle(){
+            
+            $(".hide_box").fadeToggle();
+            $(".shang_box").fadeToggle();
+          }
+        </script>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/"></a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Yashon 的个人博客">Yashon</a></p>
+        <p><span>发布时间:</span>2018年02月01日 - 06时12分</p>
+        <p><span>最后更新:</span>2018年02月01日 - 06时12分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/" title="">http://yoursite.com/2018/02/01/redis replication以及master持久化对主从架构的安全意义/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2018/02/01/redis replication以及master持久化对主从架构的安全意义/　　作者: Yashon" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2018/02/01/redis中的哨兵架构的相关知识/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/02/01/redis主从架构搭建（一主一从）/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#redis-replication-基本原理"><span class="toc-number">1.</span> <span class="toc-text">redis replication 基本原理</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#redis-replication核心机制"><span class="toc-number"></span> <span class="toc-text">redis replication核心机制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#master的持久化对主从架构的安全意义"><span class="toc-number"></span> <span class="toc-text">master的持久化对主从架构的安全意义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#redis主从架构复制的流程"><span class="toc-number"></span> <span class="toc-text">redis主从架构复制的流程</span></a>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <div id="gitments"></div>
+<script src="/js/gitment.browser.js"></script>
+<script>
+    var gitment = new Gitment({
+      id: window.location.pathname,
+      owner: 'luuman',
+      repo: 'luuman.github.io',
+      oauth: {
+        client_id: '',
+        client_secret: '',
+      },
+    })
+    gitment.render('gitments')
+</script>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/02/01/redis中的哨兵架构的相关知识/" title="上一篇: ">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2018/02/01/redis主从架构搭建（一主一从）/" title="下一篇: ">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis中的哨兵架构的相关知识/">redis中的哨兵架构的相关知识</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/">redis replication以及master持久化对主从架构的安全意义</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis主从架构搭建（一主一从）/">redis主从架构搭建（一主一从）</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis数据备份方案/">redis数据备份方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis的AOF持久化/">redis的AOF持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/手撕HashMap/">手撕HashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/Redis的RDB持久化配置/">Redis的RDB持久化配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/">缓存穿透、缓存并发、热点缓存之最佳招式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis持久化/">redis持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/31/Linux中安装redis及开发和生产启动/">Linux中安装redis及开发和生产启动</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/27/hello-world/">Hello World</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 Yashon
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> by luuman
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >海贼到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

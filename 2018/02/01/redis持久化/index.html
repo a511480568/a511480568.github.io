@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>眺望远方</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="redis持久化 redis持久化的意义在于故障恢复；比如部署了一台redis，作为cache缓存，数据存放在内存中，如果redis发生了灾难性的故障，我们把redis恢复之后数据是无法恢复的。 如果redis持久化到磁盘上，再将磁盘上的数据备份一份放在云上（比如阿里云的ODPS）。如果发生了灾难性的故障，磁盘中的数据也一时半会无法取到，可以另外起一台redis，然后从云上把数据拉到硬盘上，red">
+<meta property="og:type" content="article">
+<meta property="og:title" content="眺望远方">
+<meta property="og:url" content="http://yoursite.com/2018/02/01/redis持久化/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta property="og:description" content="redis持久化 redis持久化的意义在于故障恢复；比如部署了一台redis，作为cache缓存，数据存放在内存中，如果redis发生了灾难性的故障，我们把redis恢复之后数据是无法恢复的。 如果redis持久化到磁盘上，再将磁盘上的数据备份一份放在云上（比如阿里云的ODPS）。如果发生了灾难性的故障，磁盘中的数据也一时半会无法取到，可以另外起一台redis，然后从云上把数据拉到硬盘上，red">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/redisPersistence.png?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/RDB%E5%92%8CAOF%E7%9A%84%E4%BB%8B%E7%BB%8D.png?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/AOF%20rewrite%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90.png?raw=true">
+<meta property="og:updated_time" content="2018-01-31T22:10:05.998Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="眺望远方">
+<meta name="twitter:description" content="redis持久化 redis持久化的意义在于故障恢复；比如部署了一台redis，作为cache缓存，数据存放在内存中，如果redis发生了灾难性的故障，我们把redis恢复之后数据是无法恢复的。 如果redis持久化到磁盘上，再将磁盘上的数据备份一份放在云上（比如阿里云的ODPS）。如果发生了灾难性的故障，磁盘中的数据也一时半会无法取到，可以另外起一台redis，然后从云上把数据拉到硬盘上，red">
+<meta name="twitter:image" content="https://github.com/a511480568/image/blob/master/redisPersistence.png?raw=true">
+  
+    <link rel="alternative" href="/atom.xml" title="眺望远方" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/head.jpg" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Yashon</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/Home">博客首页</a></li>
+                        
+                            <li><a href="/works">作品展示</a></li>
+                        
+                            <li><a href="/about">留言打卡</a></li>
+                        
+                            <li><a href="/FrontEndGuide">前端导航</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                            
+                                <a class="fl weibo" target="_blank" href="#" title="weibo">weibo</a>
+                            
+                                <a class="fl google" target="_blank" href="#" title="google">google</a>
+                            
+                                <a class="fl twitter" target="_blank" href="#" title="twitter">twitter</a>
+                            
+                                <a class="fl linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://luuman.github.io/">name</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Yashon</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/head.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Yashon</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/Home">博客首页</a></li>
+                
+                    <li><a href="/works">作品展示</a></li>
+                
+                    <li><a href="/about">留言打卡</a></li>
+                
+                    <li><a href="/FrontEndGuide">前端导航</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                    
+                        <a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+                    
+                        <a class="google" target="_blank" href="#" title="google">google</a>
+                    
+                        <a class="twitter" target="_blank" href="#" title="twitter">twitter</a>
+                    
+                        <a class="linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-redis持久化" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/02/01/redis持久化/" class="article-date">
+      <time datetime="2018-01-31T22:10:05.929Z" itemprop="datePublished">2018-02-01</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>redis持久化</p>
+<p>redis持久化的意义在于故障恢复；比如部署了一台redis，作为cache缓存，数据存放在内存中，如果redis发生了灾难性的故障，我们把redis恢复之后数据是无法恢复的。</p>
+<p>如果redis持久化到磁盘上，再将磁盘上的数据备份一份放在云上（比如阿里云的ODPS）。如果发生了灾难性的故障，磁盘中的数据也一时半会无法取到，可以另外起一台redis，然后从云上把数据拉到硬盘上，redis在启动时就会把磁盘中的数据加入到内存中，具体如下图：<br><img src="https://github.com/a511480568/image/blob/master/redisPersistence.png?raw=true" alt="redis持久化"></p>
+<p>redis的两种持久化机制：RDB和AOF</p>
+<h5 id="两种机制介绍"><a href="#两种机制介绍" class="headerlink" title="两种机制介绍"></a>两种机制介绍</h5><ul>
+<li>RDB持久化机制，对redis中的数据进行周期性的持久化</li>
+</ul>
+<blockquote>
+<p>比如在12:00时redis中有2000条数据，此时redis向RDB中进行一次持久化，12:30时redis中有3500条数据，此时redis再次进行一次持久化，此时RDB中有3500条数据。RDB每隔几分钟或者几小时或者几天，生成一份redis内存中数据的一份完整的快照。</p>
+</blockquote>
+<ul>
+<li>AOF机制对每条写入命令作为日志，以append-only的模式写入一个日志文件，在redis重启的时候可以通过回放AOF日志中的写入指令来重新构建整个数据集</li>
+</ul>
+<blockquote>
+<p>每当有一条数据进入redis时，redis就会写入到AOF文件中；然而redis中的数据，是有一定限量的，不可能说redis内存中的数据无限增长，进而导致AOF无限增长。内存大小是一定的，到一定时候，redis就会用缓存淘汰算法，LRU，自动将一部分数据清除。由于内存的数据是一定量的，AOF是存放每条写命令的，所以会不断的膨胀，当大到一定的时候，AOF做rewrite操作。AOF的rewrite操作，就会基于当时redis内存中的数据生成一份小的AOF文件，然后将旧的膨胀的AOF文件给删除</p>
+</blockquote>
+<p><img src="https://github.com/a511480568/image/blob/master/RDB%E5%92%8CAOF%E7%9A%84%E4%BB%8B%E7%BB%8D.png?raw=true" alt="RDB和AOF的介绍"></p>
+<p><img src="https://github.com/a511480568/image/blob/master/AOF%20rewrite%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90.png?raw=true" alt="AOF rewrite原理剖析"></p>
+<p>对于第二张图可以理解为：redis对AOF的操作</p>
+<ol>
+<li><p>比如redis限定了总内存大小只能存放1G的数据，当外部向redis写入100w条数据时就达到了1G，由于外部每往redis中写入一条数据，redis就会向AOF中存放一条数据，所以此时AOF中也有100w条数据了。</p>
+</li>
+<li><p>此时redis内存达到了最大值，就会将最不经常使用的数据，从内存中删除，比如此时redis清除了50w条数据</p>
+</li>
+<li><p>外部接着往redis内存中写入数据，当redis再一次达到最大内存比如还是100w条数据，此时AOF文件中就有150w条数据</p>
+</li>
+<li><p>此时AOF就会创建一个新的来存放当前redis内存中的100w条数据，把旧的AOF文件删除</p>
+</li>
+</ol>
+<font color="red">综上所述：通过RDB和AOF都可以对redis内存中的数据持久化到磁盘中，然后将磁盘中的数据备份到云服务上。如果redis挂了，服务器的内存中和磁盘中的数据都丢失了，可以从云服务上拷贝回来，放到指定目录中，重启redis，redis就会自动根据持久化文件中的数据恢复到内存中。<br><br>如果同时使用RDB和AOF两种持久化机制，那么在redis重启时，会使用AOF来重新构建之前的数据，因为AOF中的数据更加完整！<br></font>
+
+<h5 id="RDB和AOF的优缺点"><a href="#RDB和AOF的优缺点" class="headerlink" title="RDB和AOF的优缺点"></a>RDB和AOF的优缺点</h5><h6 id="emsp-emsp-RDB的优点"><a href="#emsp-emsp-RDB的优点" class="headerlink" title="&emsp;&emsp;RDB的优点"></a>&emsp;&emsp;RDB的优点</h6><ul>
+<li>RDB会生成多份文件，每个数据文件都代表了某个时刻redis的数据，这种多个数据文件的方式，特别适合做冷备份，可以将完整的数据文件发送到云服务上，以预定好的备份策略来定期备份redis数据</li>
+</ul>
+<blockquote>
+<p>RDB做冷备份，生成多个文件，每个文件都代表了某个时刻redis的数据</p>
+<p>AOF也可以做冷备份，虽然只有一个文件，但可以每隔一段时间就复制一份这个文件</p>
+</blockquote>
+<ul>
+<li>RDB对redis对外提供的读写服务，影响非常小，可以让redis保持高性能，因为redis主进程只需要fork一个子进程，让子进程执行磁盘IO操作来进行RDB持久化即可</li>
+</ul>
+<blockquote>
+<p>RDB，每次写，都是直接写redis内存，只是在一定时候，才会将数据写入磁盘</p>
+<p>AOF，每次都要写入磁盘，虽然可以快速写入 os cache中，但还是有一定的时间开销，比RDB方式时间略长一些</p>
+</blockquote>
+<ul>
+<li>相对于AOF持久化机制来说，直接基于RDB数据文件来重启和恢复redis，更加快速</li>
+</ul>
+<blockquote>
+<p>AOF，存放的是指令日志，做数据恢复时，其实是要回放和执行这些日志指令来恢复出来内存中的数据</p>
+<p>RDB中存放的就是数据，恢复的时候直接加载到内存中即可</p>
+</blockquote>
+<h6 id="emsp-emsp-RDB的缺点"><a href="#emsp-emsp-RDB的缺点" class="headerlink" title="&emsp;&emsp;RDB的缺点"></a>&emsp;&emsp;RDB的缺点</h6><ul>
+<li>数据恢复没有AOF好</li>
+</ul>
+<blockquote>
+<p>比如RDB，每五分钟写入一次数据，如果在这五分钟内redis进程挂了，那么这五分钟内的数据就丢失了，这个问题也是RDB最大的缺点</p>
+</blockquote>
+<ul>
+<li>RDB每次在fork子进程来执行rdb快照数据文件生成的时候，如果数据文件特别大，可能会导致对客户端提供的服务暂停几毫秒甚至几秒</li>
+</ul>
+<blockquote>
+<p>一般不要让RDB的时间间隔太长，否则每次生成的RDB文件太大了，对redis本身的性能可能会有影响</p>
+</blockquote>
+<h6 id="emsp-emsp-AOF优点"><a href="#emsp-emsp-AOF优点" class="headerlink" title="&emsp;&emsp;AOF优点"></a>&emsp;&emsp;AOF优点</h6><ol>
+<li><p>AOF可以更好的保护数据不丢失，一般AOF会每隔1s，通过一个后台进程执行一次fsync操作，最多丢失1s的数据</p>
+</li>
+<li><p>AOF日志文件以appen-only模式写入，所以没有任何磁盘寻址的开销，写入性能非常高，而且文件不容易破损，即使文件尾部破损，也很容易恢复</p>
+</li>
+<li><p>AOF文件过大的时候，出现后台重写操作，也不会影响客户端读写。因为在rewrite log的时候会对其中的指导进行压缩，创建出一份需要恢复数据的最小日志出来。再创建新日志文件的时候，老的日志文件还是照常写入。当新的merge后的日志文件ready的时候，再交换新老日志文件即可。</p>
+</li>
+<li><p>AOF日志文件的命令通过非常可读的方式进行记录，这个特性非常适合做灾难性的误删除的紧急恢复。比如某人不小心用flushall命令清空了所有数据，只要这个时候后台rewrite还没有发生，那么就可以立即拷贝AOF文件，将最后一条flushall命令给删了，然后再将该AOF文件放回去，就可以通过恢复机制，自动恢复所有数据</p>
+</li>
+</ol>
+<h6 id="emsp-emsp-AOF缺点"><a href="#emsp-emsp-AOF缺点" class="headerlink" title="&emsp;&emsp;AOF缺点"></a>&emsp;&emsp;AOF缺点</h6><ol>
+<li><p>对于同一份数据来说，AOF日志文件通常比RDB数据快照文件更大</p>
+</li>
+<li><p>AOF开启后，支持的写QPS会比RDB支持的写QPS低，因为AOF一般会配置成每秒fsync一次日志文件，当然，每秒一次fsync，性能也还是很高的</p>
+</li>
+<li><p>以前AOF发生过bug，就是通过AOF记录的日志，进行数据恢复的时候，没有恢复一模一样的数据出来。所以说，类似AOF这种较为复杂的基于命令日志/merge/回放的方式，比基于RDB每次持久化一份完整的数据快照文件的方式，更加脆弱一些，容易有bug。不过AOF就是为了避免rewrite过程导致的bug，因此每次rewrite并不是基于旧的指令日志进行merge的，而是基于当时内存中的数据进行指令的重新构建，这样健壮性会好很多。</p>
+</li>
+<li><p>唯一的比较大的缺点，其实就是做数据恢复的时候，会比较慢，还有做冷备，定期的备份，不太方便，可能要自己手写复杂的脚本去做，做冷备不太合适</p>
+</li>
+</ol>
+<h6 id="emsp-emsp-两者的选择"><a href="#emsp-emsp-两者的选择" class="headerlink" title="&emsp;&emsp;两者的选择"></a>&emsp;&emsp;两者的选择</h6><ol>
+<li><p>不要仅仅使用RDB，因为那样会导致你丢失很多数据</p>
+</li>
+<li><p>也不要仅仅使用AOF，因为那样有两个问题，第一，你通过AOF做冷备，没有RDB做冷备，来的恢复速度更快; 第二，RDB每次简单粗暴生成数据快照，更加健壮，可以避免AOF这种复杂的备份和恢复机制的bug</p>
+</li>
+<li><p>综合使用AOF和RDB两种持久化机制，用AOF来保证数据不丢失，作为数据恢复的第一选择; 用RDB来做不同程度的冷备，在AOF文件都丢失或损坏不可用的时候，还可以使用RDB来进行快速的数据恢复</p>
+</li>
+</ol>
+<p>以上就是redis持久化的相关概念及优缺点</p>
+
+      
+      
+        <div class="page-reward">
+          <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang">赏</a></p>
+          <div class="hide_box"></div>
+          <div class="shang_box">
+            <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
+            <div class="shang_tit">
+              <p>纯属好玩</p>
+            </div>
+            <div class="shang_payimg">
+              <img src="/img/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+            </div>
+              <div class="pay_explain">扫码打赏，你说多少就多少</div>
+            <div class="shang_payselect">
+              
+                <div class="pay_item checked" data-id="alipay">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/alipay.png" alt="支付宝" /></span>
+                </div>
+              
+              
+                <div class="pay_item" data-id="wechat">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/weixin.png" alt="微信" /></span>
+                </div>
+              
+            </div>
+            <div class="shang_info">
+              <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+        <script type="text/javascript">
+          $(".pay_item").click(function(){
+            $(this).addClass('checked').siblings('.pay_item').removeClass('checked');
+            var dataid=$(this).attr('data-id');
+            $(".shang_payimg img").attr("src","/img/"+dataid+"img.jpg");
+            $("#shang_pay_txt").text(dataid=="alipay"?"支付宝":"微信");
+          });
+          function dashangToggle(){
+            
+            $(".hide_box").fadeToggle();
+            $(".shang_box").fadeToggle();
+          }
+        </script>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/02/01/redis持久化/"></a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Yashon 的个人博客">Yashon</a></p>
+        <p><span>发布时间:</span>2018年02月01日 - 06时10分</p>
+        <p><span>最后更新:</span>2018年02月01日 - 06时10分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/02/01/redis持久化/" title="">http://yoursite.com/2018/02/01/redis持久化/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2018/02/01/redis持久化/　　作者: Yashon" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/31/Linux中安装redis及开发和生产启动/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#两种机制介绍"><span class="toc-number">1.</span> <span class="toc-text">两种机制介绍</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#RDB和AOF的优缺点"><span class="toc-number">2.</span> <span class="toc-text">RDB和AOF的优缺点</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-emsp-RDB的优点"><span class="toc-number">2.1.</span> <span class="toc-text">  RDB的优点</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-emsp-RDB的缺点"><span class="toc-number">2.2.</span> <span class="toc-text">  RDB的缺点</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-emsp-AOF优点"><span class="toc-number">2.3.</span> <span class="toc-text">  AOF优点</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-emsp-AOF缺点"><span class="toc-number">2.4.</span> <span class="toc-text">  AOF缺点</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#emsp-emsp-两者的选择"><span class="toc-number">2.5.</span> <span class="toc-text">  两者的选择</span></a></li></ol></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <div id="gitments"></div>
+<script src="/js/gitment.browser.js"></script>
+<script>
+    var gitment = new Gitment({
+      id: window.location.pathname,
+      owner: 'luuman',
+      repo: 'luuman.github.io',
+      oauth: {
+        client_id: '',
+        client_secret: '',
+      },
+    })
+    gitment.render('gitments')
+</script>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" title="上一篇: ">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2018/01/31/Linux中安装redis及开发和生产启动/" title="下一篇: ">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis中的哨兵架构的相关知识/">redis中的哨兵架构的相关知识</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/">redis replication以及master持久化对主从架构的安全意义</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis主从架构搭建（一主一从）/">redis主从架构搭建（一主一从）</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis数据备份方案/">redis数据备份方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis的AOF持久化/">redis的AOF持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/手撕HashMap/">手撕HashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/Redis的RDB持久化配置/">Redis的RDB持久化配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/">缓存穿透、缓存并发、热点缓存之最佳招式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis持久化/">redis持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/31/Linux中安装redis及开发和生产启动/">Linux中安装redis及开发和生产启动</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/27/hello-world/">Hello World</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 Yashon
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> by luuman
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >海贼到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

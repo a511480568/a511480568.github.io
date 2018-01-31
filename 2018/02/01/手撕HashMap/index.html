@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>眺望远方</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="手撕HashMap 主要涉及以下几点：  HashMap的数据结构 HashMap涉及的细节讨论 HashMap中的一些注意事项  一、HashMap数据结构HashMap的数据结构是由数组+链表组成 数组：采用一段连续的存储单元来存储数据。对于指定下标的查找，时间复杂度为O(1)；通过给定值查找，需要遍历数据的元素进行逐一对比，时间复杂度为O(n) 链表：对于链表的新增、删除操作（在找到指定位置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="眺望远方">
+<meta property="og:url" content="http://yoursite.com/2018/02/01/手撕HashMap/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta property="og:description" content="手撕HashMap 主要涉及以下几点：  HashMap的数据结构 HashMap涉及的细节讨论 HashMap中的一些注意事项  一、HashMap数据结构HashMap的数据结构是由数组+链表组成 数组：采用一段连续的存储单元来存储数据。对于指定下标的查找，时间复杂度为O(1)；通过给定值查找，需要遍历数据的元素进行逐一对比，时间复杂度为O(n) 链表：对于链表的新增、删除操作（在找到指定位置">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/HashMap1.png?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/HashMap2.png?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/HashMap3.png?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/HashMap4.png?raw=true">
+<meta property="og:updated_time" content="2018-01-31T22:11:03.081Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="眺望远方">
+<meta name="twitter:description" content="手撕HashMap 主要涉及以下几点：  HashMap的数据结构 HashMap涉及的细节讨论 HashMap中的一些注意事项  一、HashMap数据结构HashMap的数据结构是由数组+链表组成 数组：采用一段连续的存储单元来存储数据。对于指定下标的查找，时间复杂度为O(1)；通过给定值查找，需要遍历数据的元素进行逐一对比，时间复杂度为O(n) 链表：对于链表的新增、删除操作（在找到指定位置">
+<meta name="twitter:image" content="https://github.com/a511480568/image/blob/master/HashMap1.png?raw=true">
+  
+    <link rel="alternative" href="/atom.xml" title="眺望远方" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/head.jpg" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Yashon</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/Home">博客首页</a></li>
+                        
+                            <li><a href="/works">作品展示</a></li>
+                        
+                            <li><a href="/about">留言打卡</a></li>
+                        
+                            <li><a href="/FrontEndGuide">前端导航</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                            
+                                <a class="fl weibo" target="_blank" href="#" title="weibo">weibo</a>
+                            
+                                <a class="fl google" target="_blank" href="#" title="google">google</a>
+                            
+                                <a class="fl twitter" target="_blank" href="#" title="twitter">twitter</a>
+                            
+                                <a class="fl linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://luuman.github.io/">name</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Yashon</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/head.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Yashon</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/Home">博客首页</a></li>
+                
+                    <li><a href="/works">作品展示</a></li>
+                
+                    <li><a href="/about">留言打卡</a></li>
+                
+                    <li><a href="/FrontEndGuide">前端导航</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                    
+                        <a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+                    
+                        <a class="google" target="_blank" href="#" title="google">google</a>
+                    
+                        <a class="twitter" target="_blank" href="#" title="twitter">twitter</a>
+                    
+                        <a class="linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-手撕HashMap" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/02/01/手撕HashMap/" class="article-date">
+      <time datetime="2018-01-31T22:11:03.034Z" itemprop="datePublished">2018-02-01</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>手撕HashMap</p>
+<p>主要涉及以下几点：</p>
+<ul>
+<li>HashMap的数据结构</li>
+<li>HashMap涉及的细节讨论</li>
+<li>HashMap中的一些注意事项</li>
+</ul>
+<h5 id="一、HashMap数据结构"><a href="#一、HashMap数据结构" class="headerlink" title="一、HashMap数据结构"></a>一、HashMap数据结构</h5><p>HashMap的数据结构是由数组+链表组成</p>
+<p><strong>数组</strong>：采用一段连续的存储单元来存储数据。对于指定下标的查找，时间复杂度为O(1)；通过给定值查找，需要遍历数据的元素进行逐一对比，时间复杂度为O(n)</p>
+<p><strong>链表</strong>：对于链表的新增、删除操作（在找到指定位置后），仅需处理节点间的引用即可，时间复杂度为O(1)，而查找操作需要遍历链表进行逐一比对，时间复杂度为O(n)</p>
+<p>所以为了快速定位并且能够快速的增删，使用了数组+链表的方式</p>
+<h5 id="二、HashMap涉及的细节讨论"><a href="#二、HashMap涉及的细节讨论" class="headerlink" title="二、HashMap涉及的细节讨论"></a>二、HashMap涉及的细节讨论</h5><ul>
+<li>写入时位置如何确定</li>
+</ul>
+<p>HashMap在put或者get时都会对key进行hash算法进行位置的确定：由于HashMap重写了equals和hashcode，put时对key算出hashcode，对hashcode进行hash算法，得出的值，和数组的长度length-1进行&amp;运算，得出位置下标。但是这种hash算法得出的位置可能是冲突的，所以用到了链表，将位置相同的key放在同一个位置中，使用链表将各个key进行关联。</p>
+<p>数组中的每一个元素都是一个Entry对象，Entry对象中有K,V,next几个元素，其中next元素指向是下一个Entry对象，如果put时两个key算出的位置是一样的，后进来的对象放在该数组位置的头部，next指向之前存入的Entry对象。如果next没有元素就默认为null</p>
+<p>如果put时key为null时，默认存放数组的第一个空间</p>
+<p>所以HashMap的整体图大致如下：<br><img src="https://github.com/a511480568/image/blob/master/HashMap1.png?raw=true" alt="HashMap存储和取出整体图"></p>
+<ul>
+<li>hash算法</li>
+</ul>
+<p>hash算法设计的目的：快速定位到元素的位置并且得出的位置要尽量散列</p>
+<p>如果hash函数设计的不好可能会导致：</p>
+<blockquote>
+<p>数组其他位置没有利用到，浪费存储空间</p>
+<p>链表太长，说明我们的冲突概率太高，导致快存或者快取需要大量的逻辑判断，势必会影响存取效率</p>
+</blockquote>
+<ul>
+<li>初始长度或者在扩容时为何都是2^n</li>
+</ul>
+<p>原因是参与hash算法运算的length-1，换算撑二进制，所有低位都是1，散列越分散；length-1如果换算撑二进制权位0越多，那么会造成冲突概率越多。</p>
+<p>在HashMap中下标位置的确定流程是：<br><img src="https://github.com/a511480568/image/blob/master/HashMap2.png?raw=true" alt="HashMap中数组下标位置的确定"></p>
+<p>所以HashMap的数组长度一定是2的次幂，这样在做位运算时能够散列开，并且数组进行扩容时，需要对index进行重新计算，扩容的长度也是2的次幂，计算index时也是length-1，这样会尽量保证位置是散列开的，如果低位中其中一个是0，那么在进行&amp;运算时就可能会有一半的概率发生哈希碰撞</p>
+<p>权位都是1，算出的index会更加散列开：</p>
+<p><img src="https://github.com/a511480568/image/blob/master/HashMap3.png?raw=true" alt="hashmap位运算"></p>
+<p>如果低位中有一个为0，那么算出的位置发生哈希冲突的概率会大大提高：</p>
+<p><img src="https://github.com/a511480568/image/blob/master/HashMap4.png?raw=true" alt="hashmap位运算"></p>
+<h5 id="三、HashMap注意"><a href="#三、HashMap注意" class="headerlink" title="三、HashMap注意"></a>三、HashMap注意</h5><ul>
+<li>为何要重写equals和hashcode方法</li>
+</ul>
+<p>如果只重写了equals而没有重写hashcode方法的话，得出的结果如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EqualsAndHashCode</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">		<span class="keyword">int</span> idCard;</span><br><span class="line">		</span><br><span class="line">		String name;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(<span class="keyword">int</span> idCard,String name)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.idCard = idCard;</span><br><span class="line">			<span class="keyword">this</span>.name = name;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(<span class="keyword">this</span> == obj &amp;&amp; <span class="keyword">this</span>.hashCode() == obj.hashCode())&#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(<span class="keyword">null</span> == obj || getClass() != obj.getClass())&#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			</span><br><span class="line">			Person person = (Person)obj;</span><br><span class="line">			<span class="keyword">return</span> (<span class="keyword">this</span>.hashCode() == person.hashCode()) &amp;&amp; (<span class="keyword">this</span>.idCard == person.idCard);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="comment">//HashMap&lt;Person, String&gt; map = new HashMap&lt;EqualsAndHashCode.Person, String&gt;();</span></span><br><span class="line">		Person person = <span class="keyword">new</span> Person(<span class="number">666</span>, <span class="string">"abc"</span>);</span><br><span class="line">		System.out.println(<span class="string">"equals结果："</span>+ <span class="keyword">new</span> Person(<span class="number">666</span>, <span class="string">"123"</span>).equals(person));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>得出的结果为：equals结果：false</p>
+<p>如果上述代码中重写了hashcode：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EqualsAndHashCode</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">		<span class="keyword">int</span> idCard;</span><br><span class="line">		</span><br><span class="line">		String name;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(<span class="keyword">int</span> idCard,String name)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.idCard = idCard;</span><br><span class="line">			<span class="keyword">this</span>.name = name;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span>&#123;</span><br><span class="line">			<span class="keyword">return</span> idCard % <span class="number">10</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(<span class="keyword">this</span> == obj &amp;&amp; <span class="keyword">this</span>.hashCode() == obj.hashCode())&#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(<span class="keyword">null</span> == obj || getClass() != obj.getClass())&#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			</span><br><span class="line">			Person person = (Person)obj;</span><br><span class="line">			<span class="keyword">return</span> (<span class="keyword">this</span>.hashCode() == person.hashCode()) &amp;&amp; (<span class="keyword">this</span>.idCard == person.idCard);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="comment">//HashMap&lt;Person, String&gt; map = new HashMap&lt;EqualsAndHashCode.Person, String&gt;();</span></span><br><span class="line">		Person person = <span class="keyword">new</span> Person(<span class="number">666</span>, <span class="string">"abc"</span>);</span><br><span class="line">		System.out.println(<span class="string">"equals结果："</span>+ <span class="keyword">new</span> Person(<span class="number">666</span>, <span class="string">"123"</span>).equals(person));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>得出的结果为：equals结果：true</p>
+<p>所以在使用map时会根据这个来判断</p>
+<ul>
+<li>手撕HashMap</li>
+</ul>
+<p>废话不说，直接上代码：</p>
+<p>接口类:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//存入数据</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span></span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//获取数据</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(K key)</span></span>;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;</span>&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> K <span class="title">getKey</span><span class="params">()</span></span>;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> V <span class="title">getValue</span><span class="params">()</span></span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyHashMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">MyMap</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//定义默认数组大小为16</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> defaultLenght = <span class="number">1</span>&lt;&lt;<span class="number">4</span>;</span><br><span class="line">	<span class="comment">//扩容标准：使用的useSize/数组长度&gt;0.75</span></span><br><span class="line">	<span class="comment">//defaultAddSizeFactor过大造成扩容概率过低</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">double</span> defaultAddSizeFactor = <span class="number">0.75</span>;</span><br><span class="line">	<span class="comment">//使用数组位置</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> useSize;</span><br><span class="line">	<span class="comment">//定义entry数组</span></span><br><span class="line">	<span class="keyword">private</span> Entry&lt;K,V&gt;[] table = <span class="keyword">null</span>;</span><br><span class="line">	<span class="comment">//定义扩容后的entry</span></span><br><span class="line">	<span class="keyword">private</span> Entry&lt;K,V&gt;[] newTable = <span class="keyword">null</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">MyHashMap</span><span class="params">()</span></span>&#123;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">MyHashMap</span><span class="params">(<span class="keyword">int</span> length,<span class="keyword">double</span> defaultAddSizeFactor)</span></span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(length &lt; <span class="number">0</span>)&#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"长度不能为负数:"</span>+length);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span>(defaultAddSizeFactor &lt;=<span class="number">0</span> || Double.isNaN(defaultAddSizeFactor))&#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"扩容因子不合法:"</span>+defaultAddSizeFactor);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">this</span>.defaultLenght = length;</span><br><span class="line">		<span class="keyword">this</span>.defaultAddSizeFactor = defaultAddSizeFactor;</span><br><span class="line">		table = <span class="keyword">new</span> Entry[defaultLenght];</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//判断数组使用的长度</span></span><br><span class="line">		<span class="keyword">if</span>(useSize &gt; defaultAddSizeFactor * defaultLenght)&#123;</span><br><span class="line">			<span class="comment">//进行扩容</span></span><br><span class="line">			up2Size();</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//根据key和数组长度获取角标位置</span></span><br><span class="line">		<span class="keyword">int</span> index = getIndex(key,table.length);</span><br><span class="line">		Entry&lt;K,V&gt; entry = table[index];</span><br><span class="line">		<span class="keyword">if</span>(<span class="keyword">null</span> == entry)&#123;</span><br><span class="line">			<span class="comment">//说明，数组的这个位置没有使用，将数据写入这个entry对象,next为null</span></span><br><span class="line">			table[index] = <span class="keyword">new</span> Entry(key,value,<span class="keyword">null</span>);</span><br><span class="line">			useSize++;</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="comment">//说明，这个位置被使用了，需要将数据放入这个位置的头部，原来的数据放在新存入数据的next对象中，形成链表</span></span><br><span class="line">			table[index] = <span class="keyword">new</span> Entry(key,value,entry);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> table[index].getValue();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(K key)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> index = getIndex(key, table.length);</span><br><span class="line">		<span class="keyword">if</span>(<span class="keyword">null</span> == table[index])&#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//key存在的情况</span></span><br><span class="line">		<span class="keyword">return</span> findValueByEqualKey(key,table[index]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//可能存在不同的key在同一位置上形成链表结构</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> V <span class="title">findValueByEqualKey</span><span class="params">(K key, MyHashMap&lt;K, V&gt;.Entry&lt;K, V&gt; entry)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(key == entry.getKey() || key.equals(entry.getKey()))&#123;</span><br><span class="line">			<span class="keyword">return</span> entry.getValue();</span><br><span class="line">		&#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">null</span> != entry.next)&#123;</span><br><span class="line">			findValueByEqualKey(key, entry.next);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">up2Size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">//进行数组扩容，扩容到原来的两倍</span></span><br><span class="line">		newTable = <span class="keyword">new</span> Entry[<span class="number">2</span> * defaultLenght];</span><br><span class="line">		<span class="comment">//重新进行hash算法，因为hash算法用到了数组的长度，这时数组的长度发生了变化，需要重新进行hash算法，对每个元素算出相应的位置</span></span><br><span class="line">		againHash(newTable);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">againHash</span><span class="params">(MyHashMap&lt;K, V&gt;.Entry&lt;K, V&gt;[] newTable2)</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 定义一个entryList用来存放entry对象</span></span><br><span class="line">		List&lt;Entry&lt;K,V&gt;&gt; entryList = <span class="keyword">new</span> ArrayList&lt;MyHashMap&lt;K,V&gt;.Entry&lt;K,V&gt;&gt;();</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; table.length; i++)&#123;</span><br><span class="line">			<span class="keyword">if</span>(<span class="keyword">null</span> == table[i])&#123;</span><br><span class="line">				<span class="comment">//说明这个位置上没有数据，跳过这次查询，对下个位置进行判断</span></span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">//继续找存到数组上的entry对象</span></span><br><span class="line">			foundEntryByNext(table[i],entryList);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span>(entryList.size() &gt; <span class="number">0</span>)&#123;</span><br><span class="line">			defaultLenght = <span class="number">2</span> * defaultLenght;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">for</span>(Entry&lt;K,V&gt; entry : entryList)&#123;</span><br><span class="line">				<span class="keyword">if</span>(<span class="keyword">null</span> != entry)&#123;</span><br><span class="line">					<span class="comment">//在循环遍历时，对链表上的数据存入list中，但是现在需要对entry对象重新put进行hash算法，所以需要把next清空</span></span><br><span class="line">					entry.next = <span class="keyword">null</span>;</span><br><span class="line">				&#125;</span><br><span class="line">				useSize = <span class="number">0</span>;</span><br><span class="line">				put(entry.getKey(), entry.getValue());</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">foundEntryByNext</span><span class="params">(MyHashMap&lt;K, V&gt;.Entry&lt;K, V&gt; entry,</span></span></span><br><span class="line"><span class="function"><span class="params">			List&lt;MyHashMap&lt;K, V&gt;.Entry&lt;K, V&gt;&gt; entryList)</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span>(<span class="keyword">null</span> != entry &amp;&amp; <span class="keyword">null</span> != entry.next)&#123;</span><br><span class="line">			<span class="comment">//说明该位置存在链表，需要进行递归，对链表上的数据进行遍历</span></span><br><span class="line">			entryList.add(entry);</span><br><span class="line">			foundEntryByNext(entry.next, entryList);</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="comment">//该位置上不存在链表</span></span><br><span class="line">			entryList.add(entry);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">getIndex</span><span class="params">(K key, <span class="keyword">int</span> length)</span> </span>&#123;</span><br><span class="line">		<span class="comment">//数组长度减一得到的二进制低位都是1，在做&amp;运算时可以使得到的位置更散列</span></span><br><span class="line">		<span class="keyword">int</span> c = length - <span class="number">1</span>;</span><br><span class="line">		<span class="comment">//对key的hashcode进行hash算法得到的值和数组长度减一进行&amp;运算</span></span><br><span class="line">		<span class="keyword">int</span> index = hash(key.hashCode()) &amp; c;</span><br><span class="line">		<span class="keyword">return</span> index;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(<span class="keyword">int</span> hashCode)</span> </span>&#123;</span><br><span class="line">		hashCode = hashCode ^ ((hashCode &gt;&gt;&gt; <span class="number">20</span>) ^ (hashCode &gt;&gt;&gt; <span class="number">12</span>));</span><br><span class="line">		<span class="keyword">return</span> hashCode ^ ((hashCode &gt;&gt;&gt; <span class="number">7</span>) ^ (hashCode &gt;&gt;&gt; <span class="number">4</span>));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//创建一个内部存储对象，实现mymap中的entry接口</span></span><br><span class="line">	<span class="class"><span class="keyword">class</span> <span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">MyMap</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt;</span>&#123;</span><br><span class="line">		</span><br><span class="line">		K k;</span><br><span class="line">		V v;</span><br><span class="line">		<span class="comment">//指向下一个entry</span></span><br><span class="line">		Entry&lt;K,V&gt; next;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Entry</span><span class="params">(K k,V v,Entry&lt;K,V&gt; next)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.k = k;</span><br><span class="line">			<span class="keyword">this</span>.v = v;</span><br><span class="line">			<span class="keyword">this</span>.next = next;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> K <span class="title">getKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">			<span class="keyword">return</span> k;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> V <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">			<span class="keyword">return</span> v;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上就是HashMap的简单实现，如有不对，请指正！</p>
+
+      
+      
+        <div class="page-reward">
+          <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang">赏</a></p>
+          <div class="hide_box"></div>
+          <div class="shang_box">
+            <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
+            <div class="shang_tit">
+              <p>纯属好玩</p>
+            </div>
+            <div class="shang_payimg">
+              <img src="/img/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+            </div>
+              <div class="pay_explain">扫码打赏，你说多少就多少</div>
+            <div class="shang_payselect">
+              
+                <div class="pay_item checked" data-id="alipay">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/alipay.png" alt="支付宝" /></span>
+                </div>
+              
+              
+                <div class="pay_item" data-id="wechat">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/weixin.png" alt="微信" /></span>
+                </div>
+              
+            </div>
+            <div class="shang_info">
+              <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+        <script type="text/javascript">
+          $(".pay_item").click(function(){
+            $(this).addClass('checked').siblings('.pay_item').removeClass('checked');
+            var dataid=$(this).attr('data-id');
+            $(".shang_payimg img").attr("src","/img/"+dataid+"img.jpg");
+            $("#shang_pay_txt").text(dataid=="alipay"?"支付宝":"微信");
+          });
+          function dashangToggle(){
+            
+            $(".hide_box").fadeToggle();
+            $(".shang_box").fadeToggle();
+          }
+        </script>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/02/01/手撕HashMap/"></a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Yashon 的个人博客">Yashon</a></p>
+        <p><span>发布时间:</span>2018年02月01日 - 06时11分</p>
+        <p><span>最后更新:</span>2018年02月01日 - 06时11分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/02/01/手撕HashMap/" title="">http://yoursite.com/2018/02/01/手撕HashMap/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2018/02/01/手撕HashMap/　　作者: Yashon" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2018/02/01/redis的AOF持久化/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/02/01/Redis的RDB持久化配置/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#一、HashMap数据结构"><span class="toc-number">1.</span> <span class="toc-text">一、HashMap数据结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#二、HashMap涉及的细节讨论"><span class="toc-number">2.</span> <span class="toc-text">二、HashMap涉及的细节讨论</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#三、HashMap注意"><span class="toc-number">3.</span> <span class="toc-text">三、HashMap注意</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <div id="gitments"></div>
+<script src="/js/gitment.browser.js"></script>
+<script>
+    var gitment = new Gitment({
+      id: window.location.pathname,
+      owner: 'luuman',
+      repo: 'luuman.github.io',
+      oauth: {
+        client_id: '',
+        client_secret: '',
+      },
+    })
+    gitment.render('gitments')
+</script>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/02/01/redis的AOF持久化/" title="上一篇: ">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2018/02/01/Redis的RDB持久化配置/" title="下一篇: ">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis中的哨兵架构的相关知识/">redis中的哨兵架构的相关知识</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/">redis replication以及master持久化对主从架构的安全意义</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis主从架构搭建（一主一从）/">redis主从架构搭建（一主一从）</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis数据备份方案/">redis数据备份方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis的AOF持久化/">redis的AOF持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/手撕HashMap/">手撕HashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/Redis的RDB持久化配置/">Redis的RDB持久化配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/">缓存穿透、缓存并发、热点缓存之最佳招式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/redis持久化/">redis持久化</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/31/Linux中安装redis及开发和生产启动/">Linux中安装redis及开发和生产启动</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/27/hello-world/">Hello World</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 Yashon
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> by luuman
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >海贼到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
