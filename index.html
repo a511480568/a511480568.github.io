@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>眺望远方</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="眺望远方">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="眺望远方">
+  
+    <link rel="alternate" href="/atom.xml" title="眺望远方" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">眺望远方</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Linux中安装redis及开发和生产启动" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/Linux中安装redis及开发和生产启动/" class="article-date">
+  <time datetime="2018-01-31T11:56:18.018Z" itemprop="datePublished">2018-01-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Linux中安装redis及开发和生产启动redis</p>
+<p>在Linux中安装redis其实很简单，只需要将下载好的redis压缩包放进相应目录中即可（我是放在/usr/local中）。安装好redis后，启动redis有两种方式：开发模式和生产模式.</p>
+<h4 id="开发模式"><a href="#开发模式" class="headerlink" title="开发模式"></a>开发模式</h4><p>如果只是在开发模式下启动redis来做实验只需要进入安装好的redis目录中的src文件（/usr/local/redis-3.2.8/src）来启动服务端和客户端即可：</p>
+<blockquote>
+<p>启动服务端：./redis-server</p>
+<p>启动客户端：./redis-cli</p>
+</blockquote>
+<h4 id="生产环境"><a href="#生产环境" class="headerlink" title="生产环境"></a>生产环境</h4><p>但生产环境是跟着服务器启动的，并不能使用./redis-server来启动，否则客户终端断开redis就挂了。生产环境启动redis可以参照如下：</p>
+<ul>
+<li>我们安装好的redis目录下有个utils目录，将utils目录中的redis_init_script复制到/etc/init.d目录中，并重新命名为redis_6379（6379是我们希望这个redis实例监听的端口号）</li>
+<li>修改redis_6379脚本的第6行的REDISPORT，设置为相同的端口号（默认就是6379）</li>
+<li>创建两个目录：/etc/redis（存放redis的配置文件），/var/redis/6379（存放redis的持久化文件）</li>
+<li>修改redis配置文件（默认在根目录下，redis.conf），拷贝到/etc/redis目录中，修改名称为6379.conf</li>
+<li>修改6379.conf中的部分配置为生产环境:</li>
+</ul>
+<blockquote>
+<p>daemonize &emsp; <font color="#0099ff">yes</font> &emsp;    让redis以daemon进程运行</p>
+<p>pidfile  &emsp;   <font color="#0099ff">/var/run/redis_6379.pid</font> &emsp; 设置redis的pid文件位置</p>
+<p>port   &emsp;  <font color="#0099ff">6379</font> &emsp; 设置redis的监听端口号</p>
+<p>dir    &emsp; <font color="#0099ff">/var/redis/6379</font> &emsp; 设置持久化文件的存储位置</p>
+</blockquote>
+<ul>
+<li>设置开机启动redis</li>
+</ul>
+<blockquote>
+<p>在上面之前修改过的redis_6379中的最上面增加两行注释：</p>
+<p># chkconfig: &emsp;  2345 90 10</p>
+<p># description: &emsp; Redis is a persistent key-value database</p>
+<p>运行命令： chkconfig redis_6379 on</p>
+</blockquote>
+<ul>
+<li>启动redis</li>
+</ul>
+<blockquote>
+<p>cd /etc/init.d</p>
+<p>./redis_6379 start</p>
+</blockquote>
+<ul>
+<li>查看redis进程</li>
+</ul>
+<blockquote>
+<p>ps -ef | grep redis</p>
+</blockquote>
+<ul>
+<li>关闭redis</li>
+</ul>
+<blockquote>
+<p>redis-cli SHUTDOWN</p>
+</blockquote>
+<p>以上就是开发环境和生产环境中redis的启动方法，如有错误请指出！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/31/Linux中安装redis及开发和生产启动/" data-id="cjd31niat0000uojg1eprcphh" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/27/hello-world/" class="article-date">
+  <time datetime="2018-01-27T11:04:41.531Z" itemprop="datePublished">2018-01-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/27/hello-world/">Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/27/hello-world/" data-id="cjd31nib80001uojg6f2bniat" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/31/Linux中安装redis及开发和生产启动/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/27/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Yashon<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
