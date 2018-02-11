@@ -267,7 +267,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/redis主从架构搭建（一主一从）/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/Redis的RDB持久化配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yashon">
@@ -286,7 +286,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/02/01/redis主从架构搭建（一主一从）/" itemprop="url">redis主从架构搭建（一主一从）</a></h1>
+                <a class="post-title-link" href="/2018/02/01/Redis的RDB持久化配置/" itemprop="url">Redis的RDB持久化配置</a></h1>
         
 
         <div class="post-meta">
@@ -314,7 +314,7 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:50:48+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:51:15+08:00">
                 2018-02-01
               </time>
             
@@ -371,19 +371,178 @@
 
       
         
-          <p>首先搭建一主一从，往主节点写，去从节点读</p>
-<p>#####安装tcl和redis</p>
+          <p>关于RDB持久化有以下几点：</p>
 <ul>
-<li><p>安装tcl</p>
-<ul>
-<li>wget <a href="http://downloads.sourceforge.net/tcl/tcl8.6.1-src.tar.gz" target="_blank" rel="noopener">http://downloads.sourceforge.net/tcl/tcl8.6.1-src.tar.gz</a></li>
-<li>tar -xzvf tcl8.6.1-src.tar.gz</li>
-<li>cd  /usr/local/tcl8.6.1/unix/</li>
-<li>./configure  </li>
-<li>make &amp;&amp; make install
+<li>如何配置RDB持久化</li>
+<li>RDB持久化机制的工作流程</li>
+<li>基于RDB持久化机制数据恢复的实验</li>
+</ul>
+<h5 id="一、如何配置RDB持久化"><a href="#一、如何配置RDB持久化" class="headerlink" title="一、如何配置RDB持久化"></a>一、如何配置RDB持久化</h5><p>RDB持久化的配置在/etct/redis/6379.conf文件中，之前文章有讲到<a href="http://176.122.175.92:2368/linuxzhong-an-zhuang-redis/" target="_blank" rel="noopener">Linux中安装redis及开发和生产启动redis</a>。6379.conf文件中默认会有几种配置方式：<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/02/01/redis主从架构搭建（一主一从）/#more" rel="contents">
+            <a class="btn" href="/2018/02/01/Redis的RDB持久化配置/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yashon">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/timg.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="眺望远方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" itemprop="url">缓存穿透、缓存并发、热点缓存之最佳招式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T20:45:35+08:00">
+                2018-02-01
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:50:38+08:00">
+                2018-02-01
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/高并发缓存/" itemprop="url" rel="index">
+                    <span itemprop="name">高并发缓存</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>我们在用缓存的时候，不管是Redis或者Memcached，基本上会通用遇到以下三个问题：</p>
+<ul>
+<li>缓存穿透</li>
+<li>缓存并发</li>
+<li>缓存失效
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -601,7 +760,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/redis中的哨兵架构的相关知识/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yashon">
@@ -620,7 +779,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" itemprop="url">缓存穿透、缓存并发、热点缓存之最佳招式</a></h1>
+                <a class="post-title-link" href="/2018/02/01/redis中的哨兵架构的相关知识/" itemprop="url">redis中的哨兵架构的相关知识</a></h1>
         
 
         <div class="post-meta">
@@ -648,8 +807,8 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:50:38+08:00">
-                2018-02-01
+              <time title="更新于" itemprop="dateModified" datetime="2018-02-07T20:50:34+08:00">
+                2018-02-07
               </time>
             
           </span>
@@ -705,14 +864,12 @@
 
       
         
-          <h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>我们在用缓存的时候，不管是Redis或者Memcached，基本上会通用遇到以下三个问题：</p>
-<ul>
-<li>缓存穿透</li>
-<li>缓存并发</li>
-<li>缓存失效
+          <p>redis如果要能达到99.99%的高可用，就需要使用哨兵架构来维持，以下是哨兵的相关概念：</p>
+<p><strong>哨兵的介绍</strong></p>
+<p><img src="https://github.com/a511480568/image/blob/master/sentinel.jpg?raw=true" alt="哨兵图解"><br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/#more" rel="contents">
+            <a class="btn" href="/2018/02/01/redis中的哨兵架构的相关知识/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -961,7 +1118,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -972,7 +1129,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -983,7 +1140,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
