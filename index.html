@@ -314,7 +314,7 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-02-27T21:25:26+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2018-02-27T21:28:35+08:00">
                 2018-02-27
               </time>
             
@@ -371,56 +371,19 @@
 
       
         
-          
-            <h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>外观模式（Facade），为子系统中的一组接口提供一个一致的界面，定义一个高层接口，这个接口使得这一子系统更加容易使用。</p>
+          <h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>外观模式（Facade），为子系统中的一组接口提供一个一致的界面，定义一个高层接口，这个接口使得这一子系统更加容易使用。</p>
 <h4 id="适用"><a href="#适用" class="headerlink" title="适用"></a>适用</h4><p>在遇到以下情况可以使用facade模式：</p>
 <ol>
 <li><p>当你要为一个复杂子系统提供一个简单接口时。子系统往往因为不断演化而变得越来越复杂。大多数模式使用时都会产生更多更小的类。这使得子系统更具有可重用性，也更容易对子系统进行定制，但这也给那些不需要定制子系统的用户带来一些使用上的困难。facade可以提供一个简单的缺省视图。</p>
 </li>
 <li><p>客户程序与抽象类的实现部分之间存在着很大的依赖性。引入facade将这个子系统与客户以及其他的子系统分离，可以提高子系统的独立性和可移植性。</p>
-</li>
-<li><p>当你需要构建一个层次结构的子系统时，使用facade模式定义子系统中每层的入口点。如果子系统之间是相互依赖的，你可以让他们仅通过facade进行通讯，从而简化了它们之间的依赖关系</p>
-</li>
-</ol>
-<h4 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h4><p><img src="https://github.com/a511480568/image/blob/master/facade_1.jpg?raw=true" alt="facade_1"></p>
-<p><img src="https://github.com/a511480568/image/blob/master/facade_2.jpg?raw=true" alt="facade_2"></p>
-<h4 id="成员"><a href="#成员" class="headerlink" title="成员"></a>成员</h4><ul>
-<li><p>外观角色：是模式的核心，他被客户端调用，知道各个子系统的功能。同事根据客户角色已有的需求预定了几种功能组合</p>
-</li>
-<li><p>子系统角色：实现子系统的功能，并处理由facade对象指派的任务。对子系统而言，facade和client角色是未知的，没有facade的任何相关信息；即没有指向facade的实例</p>
-</li>
-<li><p>客户角色：调用facade角色获得完成相应的功能</p>
-</li>
-</ul>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>举一个最简单的例子，比如一个页面中有很多字段，而有些字段和数据库中的字段并不匹配，我们service层写的业务逻辑中的字段都是和数据库中字段一一对应的，根据三层架构我们的controller层一般只用来调用，这时我们可以写一个facade来作为controller和service之间的门面，数据的组装在facade中来做，调用各个不同的接口也都在facade中来操作，这样就做了一层分离。即使以后别的页面或者接口需要用到相关的service，可以通过调用这个facade来做中转</p>
-<p>子系统：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething1</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A2</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething2</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A3</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething3</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>facade:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Facade</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        A1 a1 = <span class="keyword">new</span> A1();</span><br><span class="line">        A1 a2 = <span class="keyword">new</span> A2();</span><br><span class="line">        A1 a3 = <span class="keyword">new</span> A3();</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">        a1.doSomething1();</span><br><span class="line">        a2.doSomething2();</span><br><span class="line">        a3.doSomething3();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>client:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String []args)</span> </span>&#123;</span><br><span class="line">        Facade facade = <span class="keyword">new</span> Facade();</span><br><span class="line">        facade.doSomething();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h4><h5 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h5><ol>
-<li><p>对客户屏蔽子系统组件，减少了客户处理的对象数目并使得子系统使用起来更加容易。通过引入外观模式，客户代码将变得很简单，与之关联的对象也很少。</p>
-</li>
-<li><p>实现了子系统与客户之间的松耦合关系，这使得子系统的组件变化不会影响到调用它的客户类，只需要调整外观类即可</p>
-</li>
-<li><p>降低了大型软件系统中的编译依赖性，并简化了系统再不同平台之间的移植过程，因为编译一个子系统一般不需要编译所有其他的子系统。一个子系统的修改对其他子系统没有任何影响，而且子系统内部变化也不会影响到外观对象</p>
-</li>
-<li><p>只提供了一个访问子系统的统一入口，并不影响用户直接使用子系统类</p>
-</li>
-</ol>
-<h5 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h5><ol>
-<li><p>不能很好的限制客户使用子系统类，如果对客户访问子系统类做太多的限制则减少了可变性和灵活性</p>
-</li>
-<li><p>在不引入抽象外观类的情况下，增加新的子系统可能需要修改外观类或客户端的源代码，违背了“开闭原则”</p>
-</li>
-</ol>
-<h4 id="与其相关的其他模式"><a href="#与其相关的其他模式" class="headerlink" title="与其相关的其他模式"></a>与其相关的其他模式</h4><ol>
-<li><p>抽象工厂模式：Abstract Factory式可以与Facade模式一起使用以提供一个接口，这一接口可用来以一种子系统独立的方式创建子系统对象。 Abstract Factory也可以代替Facade模式隐藏那些与平台相关的类。</p>
-</li>
-<li><p>适配器模式：适配器模式是将一个接口通过适配来间接转换为另一个接口。</p>
-</li>
-</ol>
-<p>推荐一篇感觉写的不错的外观模式文章：<a href="http://blog.csdn.net/hguisu/article/details/7533759" target="_blank" rel="noopener">外观模式</a></p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/12/外观模式Facade/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1452,7 +1415,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/redis数据备份方案/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/redis replication以及master持久化对主从架构的安全意义/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yashon">
@@ -1471,7 +1434,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/02/01/redis数据备份方案/" itemprop="url">redis数据备份方案</a></h1>
+                <a class="post-title-link" href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/" itemprop="url">redis replication以及master持久化对主从架构的安全意义</a></h1>
         
 
         <div class="post-meta">
@@ -1499,7 +1462,7 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:51:01+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:51:32+08:00">
                 2018-02-01
               </time>
             
@@ -1556,14 +1519,11 @@
 
       
         
-          <p>redis数据备份方案一般有以下几种：</p>
-<ol>
-<li><p>写crontab定时调度脚本去做数据备份</p>
-</li>
-<li><p>每小时都copy一份rdb的备份，到一个目录中去，仅仅保留最近48小时的备份</p>
+          <p>由于单机的redis一般只能支撑几万的QPS，如果想要支撑10万+的QPS，就需要做主从架构来支撑。</p>
+<h5 id="redis-replication-基本原理"><a href="#redis-replication-基本原理" class="headerlink" title="redis replication 基本原理"></a>redis replication 基本原理</h5><p>基本原理如下：</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/02/01/redis数据备份方案/#more" rel="contents">
+            <a class="btn" href="/2018/02/01/redis replication以及master持久化对主从架构的安全意义/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1778,7 +1738,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/redis的AOF持久化/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/redis中的哨兵架构的相关知识/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yashon">
@@ -1797,7 +1757,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/02/01/redis的AOF持久化/" itemprop="url">redis的AOF持久化</a></h1>
+                <a class="post-title-link" href="/2018/02/01/redis中的哨兵架构的相关知识/" itemprop="url">redis中的哨兵架构的相关知识</a></h1>
         
 
         <div class="post-meta">
@@ -1825,8 +1785,8 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:51:21+08:00">
-                2018-02-01
+              <time title="更新于" itemprop="dateModified" datetime="2018-02-07T20:50:34+08:00">
+                2018-02-07
               </time>
             
           </span>
@@ -1882,11 +1842,12 @@
 
       
         
-          <p>本文主要是AOF持久化相关的操作</p>
-<h5 id="AOF持久化配置"><a href="#AOF持久化配置" class="headerlink" title="AOF持久化配置"></a>AOF持久化配置</h5><p>AOF持久化配置默认是关闭的，RDB是默认打开的。打开AOF配置同样是在6379.conf文件中，找到appendonly，默认是appendonly no，改为appendonly yes。打开AOF持久化配置之后，redis每次接收到一条写命令，就会写入日志文件中，当然首先是写入os cache中，然后每隔一段时间就会fsync一下。<br>
+          <p>redis如果要能达到99.99%的高可用，就需要使用哨兵架构来维持，以下是哨兵的相关概念：</p>
+<p><strong>哨兵的介绍</strong></p>
+<p><img src="https://github.com/a511480568/image/blob/master/sentinel.jpg?raw=true" alt="哨兵图解"><br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/02/01/redis的AOF持久化/#more" rel="contents">
+            <a class="btn" href="/2018/02/01/redis中的哨兵架构的相关知识/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
