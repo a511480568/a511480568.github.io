@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="jvm," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="keywords" content="jvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HotSpot垃圾收集器">
+<meta property="og:url" content="http://yoursite.com/2018/03/13/HotSpot虚拟机垃圾收集器/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/hotspotjvm.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/Serial.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/ParNew.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/Parallel%20Scavenge.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/Serial.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/Parallel%20Scavenge.jpg?raw=true">
+<meta property="og:image" content="https://github.com/a511480568/image/blob/master/CMS.jpg?raw=true">
+<meta property="og:updated_time" content="2018-03-13T13:14:16.869Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HotSpot垃圾收集器">
+<meta name="twitter:image" content="https://github.com/a511480568/image/blob/master/hotspotjvm.jpg?raw=true">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/13/HotSpot虚拟机垃圾收集器/"/>
+
+
+
+
+
+  <title>HotSpot垃圾收集器 | 眺望远方</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">眺望远方</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/13/HotSpot虚拟机垃圾收集器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yashon">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/timg.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="眺望远方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HotSpot垃圾收集器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-13T16:38:59+08:00">
+                2018-03-13
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-03-13T21:14:16+08:00">
+                2018-03-13
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://github.com/a511480568/image/blob/master/hotspotjvm.jpg?raw=true" alt="HotSpot垃圾收集器"><br><a id="more"></a></p>
+<p>上图中分为两部分：上面的是年轻代，下面的是老年代，直线相连的是可以搭配使用的。</p>
+<h3 id="年轻代"><a href="#年轻代" class="headerlink" title="年轻代"></a>年轻代</h3><h4 id="Serial收集器"><a href="#Serial收集器" class="headerlink" title="Serial收集器"></a>Serial收集器</h4><p><img src="https://github.com/a511480568/image/blob/master/Serial.jpg?raw=true" alt="serial收集器"><br>serial收集器最大的特点是“Stop the world”单线程工作，在进行垃圾收集时用户线程是完全停止的。使用的是复制算法</p>
+<h4 id="ParNew收集器"><a href="#ParNew收集器" class="headerlink" title="ParNew收集器"></a>ParNew收集器</h4><p><img src="https://github.com/a511480568/image/blob/master/ParNew.jpg?raw=true" alt="parNew收集器"><br>ParNew收集器使用的是复制算法，它其实就是Serial收集器的多线程版本，除了在垃圾收集时是多线程的，其余和Serial收集器是一致的</p>
+<h4 id="Parallel-Scavenge收集器"><a href="#Parallel-Scavenge收集器" class="headerlink" title="Parallel Scavenge收集器"></a>Parallel Scavenge收集器</h4><p><img src="https://github.com/a511480568/image/blob/master/Parallel%20Scavenge.jpg?raw=true" alt="Parallel Scavenge收集器"><br>Parallel Scavenge收集器使用的是复制算法也是并行的多线程收集器，它和ParNew收集器的关注点不同。ParNew收集器关注的是尽量缩短垃圾收集时间，而Parallel Scavenge收集器关注的是吞吐量</p>
+<p><strong>此处提两个概念并行和并发</strong></p>
+<blockquote>
+<p>并行，多条线程共同进行垃圾收集，但是用户线程是停止的</p>
+<p>并发，垃圾收集线程和用户线程是交替进行的，用户程序在继续运行，而垃圾收集器程序运行在另一个CPU之上</p>
+</blockquote>
+<p>以上三个是年轻代的垃圾收集器。</p>
+<h3 id="老年代"><a href="#老年代" class="headerlink" title="老年代"></a>老年代</h3><h4 id="Serial-Old收集器"><a href="#Serial-Old收集器" class="headerlink" title="Serial Old收集器"></a>Serial Old收集器</h4><p><img src="https://github.com/a511480568/image/blob/master/Serial.jpg?raw=true" alt="serial old收集器"><br>Serial Old收集器是Serial收集器的老年代版本，是单线程工作，使用的是“标记-整理”算法，一般使用在client模式下，在server模式下使用一般是为了替代CMS收集器，当并发收集发生Concurrent Mode Failure时会使用Serial Old代替CMS收集器。</p>
+<h4 id="Parallel-Old收集器"><a href="#Parallel-Old收集器" class="headerlink" title="Parallel Old收集器"></a>Parallel Old收集器</h4><p><img src="https://github.com/a511480568/image/blob/master/Parallel%20Scavenge.jpg?raw=true" alt="Parallel Old收集器"></p>
+<p>Parallel Old收集器是JDK1.6出现的，这个收集器主要是为了配合Parallel收集器使用，在没有Parallel收集器时，Parallel收集器只能和Serial Old收集器搭配使用，在配置很高的时候很浪费，有时还不如ParNew和CMS收集器搭配使用的效率高</p>
+<h4 id="CMS收集器"><a href="#CMS收集器" class="headerlink" title="CMS收集器"></a>CMS收集器</h4><p><img src="https://github.com/a511480568/image/blob/master/CMS.jpg?raw=true" alt="CMS收集器"></p>
+<p>CMS收集器可以说在垃圾回收是一个标志性的突破，当老年代使用CMS收集器时，年轻代只能使用Serial或者ParNew收集器，CMS收集器使用的是“标记-清除”算法，整个过程大致分为四个步骤：</p>
+<ol>
+<li><p>初始标记</p>
+</li>
+<li><p>并发标记</p>
+</li>
+<li><p>重新标记</p>
+</li>
+<li><p>并发清除</p>
+</li>
+</ol>
+<p>其中初始标记和重新标记还是要停止用户线程（Stop the world），并发标记和并发清除是和用户线程同时进行（或者交替进行）。</p>
+<p>初始标记仅仅是标记出GC ROOTS能直接关联到的对象，并发标记是进行GC ROOTS根搜索算法阶段，会判定对象是否存活，重新标记是标记出那些在并发标记阶段产生的垃圾。</p>
+<p>由于比较耗时的并发标记和并发清除阶段是和用户线程一起进行的，所以整体来说是件是缩短的</p>
+<h4 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h4><p>G1收集器是JDK1.7出现的，是为了替换掉CMS收集器，优点有：</p>
+<ol>
+<li><p>并发与并行：G1能充分利用多CPU、多核环境下的硬件优势，使用多个CPU（CPU或CPU核心）来缩短停顿（Stop The World）时间。</p>
+</li>
+<li><p>分代收集：G1不需要与其他收集器配合就能独立管理整个GC堆，但他能够采用不同方式去处理新建对象和已经存活了一段时间、熬过多次GC的老年代对象以获取更好收集效果。</p>
+</li>
+<li><p>空间整合：从整体来看是基于“标记-整理”算法实现，从局部（两个Region之间）来看是基于“复制”算法实现的，但是都意味着G1运行期间不会产生内存碎片空间，更健康，遇到大对象时，不会因为没有连续空间而进行下一次GC，甚至一次Full GC。</p>
+</li>
+<li><p>可预测的停顿：降低停顿是G1和CMS共同关注点，但G1除了追求低停顿，还能建立可预测的停顿模型，可以明确地指定在一个长度为M的时间片内，消耗在垃圾收集的时间不超过N毫秒</p>
+</li>
+<li><p>跨代特性：之前的收集器进行收集的范围都是整个新生代或老年代，而G1扩展到整个Java堆(包括新生代，老年代)。</p>
+</li>
+</ol>
+<p>G1的实现：</p>
+<ol>
+<li><p>如何实现新生代和老年代全范围收集：其实它的Java堆布局就不同于其余收集器，它将整个Java堆划分为多个大小相等的独立区域（Region），仍然保留新生代和老年代的概念，可是不是物理隔离的，都是一部分Region（不需要连续）的集合。</p>
+</li>
+<li><p>如何建立可预测的停顿时间模型：是因为有了独立区域Region的存在，就避免在Java堆中进行全区域的垃圾收集，G1跟踪各个Region里面的垃圾堆积的价值大小（回收可以获得的空间大小和回收所需要的时间的经验值），后台维护一个优先队列，根据每次允许的收集时间，优先回收价值最大的Region（Garbage-First理念）。因此使用Region划分内存空间以及有优先级的区域回收方式，保证了有限时间获得尽可能高的收集效率。</p>
+</li>
+<li><p>如何保证垃圾回收真的在Region区域进行而不会扩散到全局：由于Region并不是孤立的，一个Region的对象可以被整个Java堆的任意其余Region的对象所引用，在做可达性判定确定对象是否存活时，仍然会关联到Java堆的任意对象，G1中这种情况特别明显。而以前在别的分代收集里面，新生代规模要比老年代小许多，新生代收集也频繁得多，也会涉及到扫描新生代时也会扫描老年代的情况，相反亦然。解决：G1收集器Region之间的对象引用以及新生代和老年代之间的对象引用，虚拟机都是使用Remembered Set来避免全堆扫描。G1中每个Region都有一个与之对应的Remembered Set,虚拟机发现程序在对Reference类型的数据进行写操作时，会产生一个Write Barrier暂时中断写操作，检查Reference引用的对象是否处于不同的Region之中(分代的例子中就检查是否老年代对象引用了新生代的对象)，如果是则通过CardTable把相关引用信息记录到被引用对象所属的Region的Remembered Set之中，当进行内存回收时，在GC根节点的枚举范围中加入Remembered Set即可避免全堆扫描。</p>
+</li>
+</ol>
+<p>G1的运行步骤：</p>
+<ol>
+<li>初始标记</li>
+</ol>
+<blockquote>
+<p>初始标记仅仅标记GC Roots能直接关联到的对象，并且修改TAMS（Next Top at Mark Start）的值，让下一阶段用户程序并发运行时，能在正确可用的Region中创建新的对象。这阶段需要停顿线程，不可并行执行，但是时间很短。</p>
+</blockquote>
+<ol>
+<li>并发标记</li>
+</ol>
+<blockquote>
+<p>此阶段是从GC Roots开始对堆中对象进行可达性分析，找出存活对象，此阶段时间较长可与用户程序并发执行。</p>
+</blockquote>
+<ol>
+<li>最终标记</li>
+</ol>
+<blockquote>
+<p>此阶段是为了修正在并发标记期间因为用户线程继续运行而导致标记产生变动的那一份标记记录，虚拟机将这段时间对象变化记录在线程Remembered Set Logs里面，最终标记阶段需要把Remembered Set Logs的数据合并到Remembered Set中，这段时间需要停顿线程，但是可并行执行。</p>
+</blockquote>
+<ol>
+<li>筛选回收</li>
+</ol>
+<blockquote>
+<p>对各个Region的回收价值和成本进行排序，根据用户期望的GC停顿时间来制定回收计划</p>
+</blockquote>
+<p>以上是老年代收集器。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag"># jvm</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/07/适配器模式/" rel="next" title="java设计模式之适配器模式">
+                <i class="fa fa-chevron-left"></i> java设计模式之适配器模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/timg.jpg"
+               alt="Yashon" />
+          <p class="site-author-name" itemprop="name">Yashon</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/">
+                <span class="site-state-item-count">24</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#年轻代"><span class="nav-number">1.</span> <span class="nav-text">年轻代</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial收集器"><span class="nav-number">1.1.</span> <span class="nav-text">Serial收集器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ParNew收集器"><span class="nav-number">1.2.</span> <span class="nav-text">ParNew收集器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Scavenge收集器"><span class="nav-number">1.3.</span> <span class="nav-text">Parallel Scavenge收集器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#老年代"><span class="nav-number">2.</span> <span class="nav-text">老年代</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial-Old收集器"><span class="nav-number">2.1.</span> <span class="nav-text">Serial Old收集器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Old收集器"><span class="nav-number">2.2.</span> <span class="nav-text">Parallel Old收集器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CMS收集器"><span class="nav-number">2.3.</span> <span class="nav-text">CMS收集器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#G1收集器"><span class="nav-number">2.4.</span> <span class="nav-text">G1收集器</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yashon</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
