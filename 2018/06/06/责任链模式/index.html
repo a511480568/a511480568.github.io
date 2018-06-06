@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="设计模式," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="keywords" content="设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java设计模式之责任链模式">
+<meta property="og:url" content="http://yoursite.com/2018/06/06/责任链模式/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2018/06/06/5b17851b35d56.png">
+<meta property="og:image" content="https://i.loli.net/2018/06/06/5b178449e59d1.png">
+<meta property="og:updated_time" content="2018-06-06T13:27:03.777Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java设计模式之责任链模式">
+<meta name="twitter:image" content="https://i.loli.net/2018/06/06/5b17851b35d56.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/06/责任链模式/"/>
+
+
+
+
+
+  <title>java设计模式之责任链模式 | 眺望远方</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">眺望远方</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/06/责任链模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yashon">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/timg.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="眺望远方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">java设计模式之责任链模式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T17:00:08+08:00">
+                2018-06-06
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-06-06T21:27:03+08:00">
+                2018-06-06
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://i.loli.net/2018/06/06/5b17851b35d56.png" alt="责任链UML图"></p>
+<a id="more"></a>
+<h3 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h3><p>很久没有写文章了，一是最近比较忙，回去都很晚了，没有时间写；二是自己变得比较懒。其实归根结底还是自己懒，哈哈。</p>
+<p>今天写这个文章主要是之前看过一些设计模式但是在项目中真正用到的不多，而这个设计模式是我这几天在优化代码时想起了这个设计模式，想来用一下试试。废话不多说，先来上图，下面这张图是我的业务逻辑中的流程图</p>
+<p><img src="https://i.loli.net/2018/06/06/5b178449e59d1.png" alt="账单逻辑图"></p>
+<p>最初工期比较紧没有这张图，代码全都是if else叠在一起就上线了，上线之后回过头看原来的代码就觉得非常的混乱，到处调用，没有统一的入口，实在看不下去了就只能根据这张图来规划自己的代码，本来想的是用策略模式，后来发现和这个场景不是很吻合，最后找到了这个责任链模式</p>
+<h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>职责链模式（Chain of Responsibility）：使多个对象都有机会处理同一个请求，从而避免请求的发送者和接收者之间的耦合关系。将这些对象连成一条链，并沿着这条链传递该请求，直到有一个对象处理它为止。</p>
+<p>使用场景：为完成同一个请求，如果存在多个请求处理器以及未知请求处理器个数或者请求处理器可动态配置的情况下，可以考虑使用责任链模式。如OKHttp的拦截器就是使用的责任链模式。</p>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>都在使用请假的例子来做实例，这边在介绍我项目中用到的责任链模式的代码之前，我也跟随潮流用请假的例子把责任链进行一个入门</p>
+<p>业务介绍：我现在要请10天假，组长只能批5天，经理只能批8天，CTO批8天以上的假</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//处理请假的抽象类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">OperateLeaveHandler</span> </span>&#123;  </span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 这个是为了当前人没法处理的时候往上级传递请求 </span></span><br><span class="line"><span class="comment">     */</span>  </span><br><span class="line">    <span class="keyword">protected</span> OperateLeaveHandler operator;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOperator</span><span class="params">(OperateLeaveHandler operator)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">this</span>.operator = operator;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 根据请假的天数来审批 </span></span><br><span class="line"><span class="comment">     */</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">operateLeave</span><span class="params">(<span class="keyword">int</span> day)</span></span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//组长处理请假</span></span><br><span class="line"><span class="keyword">public</span> GroupLeader extends OperateLeaveHandler&#123;</span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operateLeave</span><span class="params">(<span class="keyword">int</span> day)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">if</span> (day &lt;=  <span class="number">5</span>) &#123;  </span><br><span class="line">            System.out.println(<span class="string">"请假天数小于"</span> + day + <span class="string">"天，我可以处理,我是组长"</span>);  </span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;  </span><br><span class="line">            <span class="comment">// 如果组长无法审批会将请求往上级传递  </span></span><br><span class="line">            operator.operateLeave(day);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//经理处理请假</span></span><br><span class="line"><span class="keyword">public</span> Manager extends OperateLeaveHandler&#123;</span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operateLeave</span><span class="params">(<span class="keyword">int</span> day)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">if</span> (day &gt; <span class="number">5</span> &amp;&amp; day &lt;=  <span class="number">8</span>) &#123;  </span><br><span class="line">            System.out.println(<span class="string">"请假天数小于"</span> + day + <span class="string">"天，我可以处理,我是经理"</span>);  </span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;  </span><br><span class="line">            <span class="comment">// 如果经理无法审批会将请求往上级传递  </span></span><br><span class="line">            operator.operateLeave(day);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//CTO处理请假</span></span><br><span class="line"><span class="keyword">public</span> CTO extends OperateLeaveHandler&#123;</span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operateLeave</span><span class="params">(<span class="keyword">int</span> day)</span> </span>&#123;  </span><br><span class="line">        System.out.println(<span class="string">"请假天数大于"</span> + day + <span class="string">"天，我可以处理,我是CTO"</span>);  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用工厂类将上面几个类进行一层包装<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OperateLeaveHandlerFactory</span> </span>&#123;  </span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> OperateLeaveHandler <span class="title">createHandler</span><span class="params">()</span></span>&#123;  </span><br><span class="line">        OperateLeaveHandler groupLeader=<span class="keyword">new</span> GroupLeader();  </span><br><span class="line">        OperateLeaveHandler manager=<span class="keyword">new</span> Manager();  </span><br><span class="line">        OperateLeaveHandler cto=<span class="keyword">new</span> CTO();   </span><br><span class="line">          </span><br><span class="line">        groupLeader.setSuccessor(manager);  </span><br><span class="line">        manager.setSuccessor(cto);</span><br><span class="line">        <span class="keyword">return</span> groupLeader;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>测试类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LeaveTest</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> OperateLeaveHandler handler;  </span><br><span class="line">      </span><br><span class="line">    <span class="function"><span class="keyword">public</span> OperateLeaveHandler <span class="title">getHandler</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> handler;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setHandler</span><span class="params">(OperateLeaveHandler handler)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">this</span>.handler = handler;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">requestDiscount</span><span class="params">(<span class="keyword">int</span> day)</span></span>&#123;  </span><br><span class="line">        handler.operateLeave(day);  </span><br><span class="line">    &#125;  </span><br><span class="line">      </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span><br><span class="line">        LeaveTest test=<span class="keyword">new</span> LeaveTest();  </span><br><span class="line">        LeaveTest.setHandler(LeaveHandlerFactory.createHandler());  </span><br><span class="line">        LeaveTest.requestDiscount(<span class="number">10</span>);  </span><br><span class="line">          </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的例子是一个简单的责任链模式，如果想要深入一下，可以参考这个人的文章<a href="https://blog.csdn.net/u012810020/article/details/71194853" target="_blank" rel="noopener">Java设计模式—-责任链模式</a>，这个作者的文章也是通过请假的例子来介绍责任链模式，但是他的例子更复杂一点，看着也很有意思，有兴趣的读者可以点击看下。</p>
+<h3 id="自己项目中的例子"><a href="#自己项目中的例子" class="headerlink" title="自己项目中的例子"></a>自己项目中的例子</h3><p>下面就是我自己在项目中使用的责任险模式了，我在自己的项目中没有使用原生的责任链模式，在网上经过一番搜索，发现Jakarta Commons的子项目Chain可以实现责任链模式，于是为了不重复造轮子和代码的健壮性等考虑因为，最终选择了使用这个东东来作为我项目代码重构的基础。</p>
+<p>至于这个东东怎么用的，各位可以自行Google，我这边也给出一个我自己看过之后觉得不错的文章分享给大家<a href="https://blog.csdn.net/lujar/article/details/1624894" target="_blank" rel="noopener">开始使用Commons Chain</a>，这是第一部分，第二部门各位自己搜索（作为一个程序员很多时候需要自己动手哈）</p>
+<p>废话不多说，我开始上我自己项目中的代码了，由于是公司的代码，所以里面的类我会进行一个处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//抽象处理类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractChain</span> <span class="keyword">implements</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">filter</span><span class="params">(AAmountContext context)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">execute</span><span class="params">(Context context)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        AAmountContext aaContext = (AAmountContext) context;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> filter(aaContext);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//具体实现类1</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NotModifyAA</span> <span class="keyword">extends</span> <span class="title">AbstractChain</span> <span class="keyword">implements</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger       LOG = LoggerFactory.getLogger(NotModifyAA.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> InfoService InfoService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">filter</span><span class="params">(AAmountContext context)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (context.getHospitalId().longValue() != context.getLiabilityId().longValue())</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        LOG.info(<span class="string">"不修改责任..."</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">new</span> BigDecimal(context.getNewAmount()).compareTo(<span class="keyword">new</span> BigDecimal(context.getOldAmount())) != <span class="number">0</span>)</span><br><span class="line">            InfoService.insertInfo(context.getSettlementId(),context.getUserName(), <span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//具体实现类2</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ModifyAA</span> <span class="keyword">extends</span> <span class="title">AbstractChain</span> <span class="keyword">implements</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> InfoService         infoService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">filter</span><span class="params">(AAmountContext context)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        LOG.info(<span class="string">"责任修改..."</span>);</span><br><span class="line">        String newAmount = context.getNewAmount();</span><br><span class="line">        String oldAmount = context.getOldAmount();</span><br><span class="line">        Long SettlementId = context.getSettlementId();</span><br><span class="line">        String userName = context.getUserName();</span><br><span class="line"></span><br><span class="line">        BigDecimal zeroAmount = BigDecimal.ZERO;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">new</span> BigDecimal(newAmount).compareTo(<span class="keyword">new</span> BigDecimal(oldAmount)) == <span class="number">0</span>) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">new</span> BigDecimal(newBillAmount).compareTo(zeroBillAmount) != <span class="number">0</span>) &#123;</span><br><span class="line">                infoService.insertReserveHistoryInfo(claimliabilitySettlementId, userName, <span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">            Long hospitalId = context.getHospitalId();</span><br><span class="line">            ResultBase&lt;InfoDTO&gt; resultBase = claimHospitalLiabilityInfoService</span><br><span class="line">                    .queryHospitalById(hospitalId);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//调用类</span></span><br><span class="line"><span class="meta">@Service</span>(<span class="string">"calAmountFacade"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CalAmountFacade</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> Chain               amountChain;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertInfo</span><span class="params">(Long hospitalId, Long liabilityId, String newAmount,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         String oldAmount, Long settlementId, String userName)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        AAmountContext context = <span class="keyword">new</span> AAmountContext();</span><br><span class="line">        <span class="comment">//此处是set方法</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            amountChain.execute(context);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            LOG.info(<span class="string">"责任链执行出错..e=&#123;&#125;"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span> = <span class="string">"amountChain"</span> <span class="attr">class</span> = <span class="string">"org.apache.commons.chain.impl.ChainBase"</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;<span class="name">constructor-arg</span>&gt;</span></span><br><span class="line">    		<span class="tag">&lt;<span class="name">list</span>&gt;</span></span><br><span class="line">    			<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"notModifyAA"</span>/&gt;</span></span><br><span class="line">    			<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"modifyAA"</span>/&gt;</span></span><br><span class="line">    		<span class="tag">&lt;/<span class="name">list</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;/<span class="name">constructor-arg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span> = <span class="string">"notModifyAA"</span> <span class="attr">class</span> = <span class="string">"com.xxx.chain.NotModifyAA"</span>&gt;</span><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span> = <span class="string">"modifyAA"</span> <span class="attr">class</span> = <span class="string">"com.xxx.chain.ModifyAA"</span>&gt;</span><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>以上是我项目中使用到的责任链模式，由于不是自己项目中的代码，所以里面的代码去掉了很多，只留了主干代码，但整体是能看出责任链模式的调用。</p>
+<p><strong>注意：</strong>在这个chain模式中返回值，如果返回true，说明不再继续执行下去，责任链到此为止，如果返回false说明这个责任结束之后会进入到下一个责任中，知道结束或者碰到返回true为止。</p>
+<h3 id="责任链模式的优缺点"><a href="#责任链模式的优缺点" class="headerlink" title="责任链模式的优缺点"></a>责任链模式的优缺点</h3><p>责任链模式很好的实现了解耦，并且优化了if else的分支,在这里面调用者不需要知道具体的传递过程，他只需要知道最终的结果被处理了。而且这个链表的结构可以被灵活的更改重组。</p>
+<p>但是它的缺点也是很明显的，首先从性能上说起，一个是调用时间，如果链表在最开始被处理了还好，万一链表跑到了最后一个才被处理，那么他的调用时间肯定会比不适用责任链模式的效率要低一些；第二是内存的问题，我们会构造出很多的链表节点对象，但是有些对象在我们的应用场景中是不会用到的，所以大大的消耗了我们的内存；</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/阅读GC日志/" rel="next" title="阅读GC日志">
+                <i class="fa fa-chevron-left"></i> 阅读GC日志
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/timg.jpg"
+               alt="Yashon" />
+          <p class="site-author-name" itemprop="name">Yashon</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#缘起"><span class="nav-number">1.</span> <span class="nav-text">缘起</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义"><span class="nav-number">2.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">3.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自己项目中的例子"><span class="nav-number">4.</span> <span class="nav-text">自己项目中的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#责任链模式的优缺点"><span class="nav-number">5.</span> <span class="nav-text">责任链模式的优缺点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yashon</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
