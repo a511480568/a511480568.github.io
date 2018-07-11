@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="其他," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="keywords" content="其他">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux安装elasticsearch">
+<meta property="og:url" content="http://yoursite.com/2018/07/11/Linux安装es及其插件/index.html">
+<meta property="og:site_name" content="眺望远方">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2018/07/11/5b45de235dcba.jpg">
+<meta property="og:updated_time" content="2018-07-11T13:36:41.277Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux安装elasticsearch">
+<meta name="twitter:image" content="https://i.loli.net/2018/07/11/5b45de235dcba.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/11/Linux安装es及其插件/"/>
+
+
+
+
+
+  <title>Linux安装elasticsearch | 眺望远方</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">眺望远方</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/11/Linux安装es及其插件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yashon">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/timg.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="眺望远方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux安装elasticsearch</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-11T17:00:08+08:00">
+                2018-07-11
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-07-11T21:36:41+08:00">
+                2018-07-11
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/其他/" itemprop="url" rel="index">
+                    <span itemprop="name">其他</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://i.loli.net/2018/07/11/5b45de235dcba.jpg" alt="timg.jpg"></p>
+<a id="more"></a>
+<p>经过两天的折腾终于把es装好了，我第一次安装成功之后当再次启动es的时候报错：找不到elasticsearch.log，很奇怪，最后我把es装载home目录下就OK了，原因现在还没找出。。</p>
+<h3 id="安装elasticsearch"><a href="#安装elasticsearch" class="headerlink" title="安装elasticsearch"></a>安装elasticsearch</h3><h4 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h4><p>首先要安装es需要的jdk版本至少是1.8，至于在Linux中安装es不是本文重点，各位可以自行百度</p>
+<h4 id="下载es版本并解压"><a href="#下载es版本并解压" class="headerlink" title="下载es版本并解压"></a>下载es版本并解压</h4><p>大家可以在<a href="https://www.elastic.co/cn/downloads/elasticsearch#ga-release" target="_blank" rel="noopener">es官网</a>下载相应的版本然后传到服务器中，我是放在了/home/es目录下，使用tar -zxvf进行解压</p>
+<h4 id="启动es及报错解决方案"><a href="#启动es及报错解决方案" class="headerlink" title="启动es及报错解决方案"></a>启动es及报错解决方案</h4><p>解压完成之后进入bin目录，使用 sh elasticsearch启动es，这时会发现报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Caused by: java.lang.RuntimeException: can not run elasticsearch as root</span><br></pre></td></tr></table></figure></p>
+<p>这是因为启动es不能用root用户，这时我们需要重新创建一个用户并赋予权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">adduser elastic</span><br><span class="line"></span><br><span class="line">chown -R elastic:elastic /home/es/elasticsearch-5.5.1/</span><br><span class="line"></span><br><span class="line">su elastic</span><br><span class="line"></span><br><span class="line">sh elasticsearch</span><br></pre></td></tr></table></figure>
+<p>这时可能还会报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Java HotSpot(TM) 64-Bit Server VM warning: INFO: os::commit_memory(0x0000000085330000, 2060255232, 0) failed; error=&apos;Cannot allocate memory&apos; (errno=12)</span><br></pre></td></tr></table></figure></p>
+<p>这是因为es 5.x版本默认分配的jvm内存为2g，我们需要修改jvm.properties文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cd config</span><br><span class="line"></span><br><span class="line">vi jvm.properties</span><br><span class="line"></span><br><span class="line"># 修改这两个参数</span><br><span class="line">-Xms256m</span><br><span class="line">-Xmx256m</span><br></pre></td></tr></table></figure>
+<p>修改完毕之后重新启动es，这时会发现es没有报错了。</p>
+<h4 id="验证es"><a href="#验证es" class="headerlink" title="验证es"></a>验证es</h4><p>使用命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:9200</span><br></pre></td></tr></table></figure></p>
+<p>如果出现以下信息说明es已经启动成功<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span> : <span class="string">"OIw7YMI"</span>,</span><br><span class="line">  <span class="attr">"cluster_name"</span> : <span class="string">"elasticsearch"</span>,</span><br><span class="line">  <span class="attr">"cluster_uuid"</span> : <span class="string">"YrD7hojuSSSraSE5QePu2w"</span>,</span><br><span class="line">  <span class="attr">"version"</span> : &#123;</span><br><span class="line">    <span class="attr">"number"</span> : <span class="string">"5.5.1"</span>,</span><br><span class="line">    <span class="attr">"build_hash"</span> : <span class="string">"19c13d0"</span>,</span><br><span class="line">    <span class="attr">"build_date"</span> : <span class="string">"2017-07-18T20:44:24.823Z"</span>,</span><br><span class="line">    <span class="attr">"build_snapshot"</span> : <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"lucene_version"</span> : <span class="string">"6.6.0"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"tagline"</span> : <span class="string">"You Know, for Search"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="配置外部访问"><a href="#配置外部访问" class="headerlink" title="配置外部访问"></a>配置外部访问</h4><p>以上的配置只能在本地访问，外部是无法访问的，这时我们需要修改elasticsearch.yml文件来</p>
+<ul>
+<li>修改配置参数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">network.host:0.0.0.0 </span><br><span class="line">http.port:9200</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>重新启动es这时可能会发现报错：提示虚拟内存太小，最大文件描述进程太小</p>
+<p>我们需要做以下修改：</p>
+<ul>
+<li>max file descriptors</li>
+</ul>
+<p>修改/etc/security/limits.conf，添加或者修改（此时不要忘了把用户切回root）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*  hard  nofile  65536</span><br><span class="line">*  soft   nofile  65536</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>max virtual memory<br>修改/etc/sysctl.conf 添加<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vm.max_map_count=2621441</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>保存后执行sudo sysctl -p /etc/sysctl.conf 使之生效</p>
+<p>其中：</p>
+<p><strong>soft nproc:可打开的文件描述符的最大数（软限制）</strong><br><strong>hard nproc:可打开的文件描述符的最大数（硬限制）</strong><br><strong>soft nofile:单个用户可用的最大进程数（软限制）</strong><br><strong>hard nofile:单个用户可用的最大进程数（硬限制）</strong></p>
+<p>这时我们再把用户切换到elastic，重新启动es，在浏览器中打开<a href="http://176.122.xx.xxx:9200/，会看到es已经正常启动了" target="_blank" rel="noopener">http://176.122.xx.xxx:9200/，会看到es已经正常启动了</a></p>
+<ul>
+<li>配置集群</li>
+</ul>
+<p>如果需要配置es集群，需要修改elasticsearch.yml文件中的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">discovery.zen.ping.unicast.hosts: [&quot;host1&quot;, &quot;host2&quot;]</span><br></pre></td></tr></table></figure></p>
+<h3 id="安装elasticsearch-head插件"><a href="#安装elasticsearch-head插件" class="headerlink" title="安装elasticsearch-head插件"></a>安装elasticsearch-head插件</h3><h4 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h4><p>从git上下载到源码<a href="https://github.com/mobz/elasticsearch-head" target="_blank" rel="noopener">elasticsearch-head</a></p>
+<p>我这边是下载到/usr/local/elastic-head目录中</p>
+<h4 id="安装grunt"><a href="#安装grunt" class="headerlink" title="安装grunt"></a>安装grunt</h4><p><strong>注意：</strong>安装grunt是需要node支持的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/elastic-head/elasticsearch-head</span><br><span class="line"></span><br><span class="line">npm install -g grunt --registry=https://registry.npm.taobao.org</span><br></pre></td></tr></table></figure></p>
+<h4 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h4><ul>
+<li>首先我们需要修改elasticsearch-head目录中的Gruntfile.js，head是默认监听的127.0.0.1,我们需要修改成我们服务器的IP地址，使用vi Gruntfile.js</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">connect: &#123;</span><br><span class="line">			server: &#123;</span><br><span class="line">				options: &#123;</span><br><span class="line">                    hostname:&apos;176.122.xx.xxx&apos;,</span><br><span class="line">					port: 9100,</span><br><span class="line">					base: &apos;.&apos;,</span><br><span class="line">					keepalive: true</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改_site目录中app.js</li>
+</ul>
+<p>修改_site目录中的app.js是为了启动head插件时能够关联到服务器上的es，如果不修改默认关联的是<a href="http://127.0.0.1:9200" target="_blank" rel="noopener">http://127.0.0.1:9200</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this.base_uri = this.config.base_uri || this.prefs.get(&quot;app-base_uri&quot;) || &quot;http://localhost:9200&quot;;  localhost 改为176.122.xx.xxx es 服务ip</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>修改elasticsearch.yml支持跨域</li>
+</ul>
+<p>接着我们修改elasticsearch.yml文件使其能够支持跨域<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http.cors.enabled: true</span><br><span class="line">http.cors.allow-origin: &quot;*&quot;</span><br></pre></td></tr></table></figure></p>
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>这是我们重新启动es 并启动elasticsearch-head</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 这是启动es的命令</span><br><span class="line">sh elasticsearh</span><br><span class="line"></span><br><span class="line">#这是启动head插件的命令</span><br><span class="line">node_modules/grunt/bin/grunt server</span><br><span class="line"></span><br><span class="line">#后台启动，进入到node_modules/grunt/bin目录</span><br><span class="line">nohup grunt server &amp;</span><br></pre></td></tr></table></figure>
+<p>这是我们在浏览器中输入地址：<a href="http://176.122.xx.xxx:9100/" target="_blank" rel="noopener">http://176.122.xx.xxx:9100/</a> 会发现我们已经关联了es，可以看到es的健康状态</p>
+<h3 id="安装kibana"><a href="#安装kibana" class="headerlink" title="安装kibana"></a>安装kibana</h3><h4 id="下载kibana插件"><a href="#下载kibana插件" class="headerlink" title="下载kibana插件"></a>下载kibana插件</h4><p>去官网下载kibana插件<a href="https://www.elastic.co/downloads/kibana" target="_blank" rel="noopener">kibana</a></p>
+<h4 id="上传至服务器并解压"><a href="#上传至服务器并解压" class="headerlink" title="上传至服务器并解压"></a>上传至服务器并解压</h4><p>将下载好的插件传到服务器上，我是放在/usr/local目录中，然后使用tar命令进行解压</p>
+<h4 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h4><p>进入到kibana目录中的config目录中，修改kibana.yml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server.port: 5601</span><br><span class="line"></span><br><span class="line">server.host: &quot;176.122.xx.xxx&quot;</span><br><span class="line"></span><br><span class="line">elasticsearch.url: &quot;http://176.122.xx.xxx:9200&quot;</span><br></pre></td></tr></table></figure></p>
+<p>然后重新启动kibana ./kibana或者nohup ./kibana</p>
+<p>在浏览器中输入<a href="http://176.122.xx.xxx:5601就可以进入kibana了。" target="_blank" rel="noopener">http://176.122.xx.xxx:5601就可以进入kibana了。</a></p>
+<p>至此es、es-head插件和kibana插件就安装完成了</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/其他/" rel="tag"># 其他</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/06/责任链模式/" rel="next" title="java设计模式之责任链模式">
+                <i class="fa fa-chevron-left"></i> java设计模式之责任链模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/timg.jpg"
+               alt="Yashon" />
+          <p class="site-author-name" itemprop="name">Yashon</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装elasticsearch"><span class="nav-number">1.</span> <span class="nav-text">安装elasticsearch</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装jdk"><span class="nav-number">1.1.</span> <span class="nav-text">安装jdk</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载es版本并解压"><span class="nav-number">1.2.</span> <span class="nav-text">下载es版本并解压</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动es及报错解决方案"><span class="nav-number">1.3.</span> <span class="nav-text">启动es及报错解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#验证es"><span class="nav-number">1.4.</span> <span class="nav-text">验证es</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置外部访问"><span class="nav-number">1.5.</span> <span class="nav-text">配置外部访问</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装elasticsearch-head插件"><span class="nav-number">2.</span> <span class="nav-text">安装elasticsearch-head插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载"><span class="nav-number">2.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装grunt"><span class="nav-number">2.2.</span> <span class="nav-text">安装grunt</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改配置"><span class="nav-number">2.3.</span> <span class="nav-text">修改配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动"><span class="nav-number">2.4.</span> <span class="nav-text">启动</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装kibana"><span class="nav-number">3.</span> <span class="nav-text">安装kibana</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载kibana插件"><span class="nav-number">3.1.</span> <span class="nav-text">下载kibana插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#上传至服务器并解压"><span class="nav-number">3.2.</span> <span class="nav-text">上传至服务器并解压</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改配置文件"><span class="nav-number">3.3.</span> <span class="nav-text">修改配置文件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yashon</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
