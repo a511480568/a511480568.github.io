@@ -1741,7 +1741,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/手撕HashMap/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yashon">
@@ -1760,7 +1760,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/02/01/手撕HashMap/" itemprop="url">手撕HashMap</a></h1>
+                <a class="post-title-link" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" itemprop="url">缓存穿透、缓存并发、热点缓存之最佳招式</a></h1>
         
 
         <div class="post-meta">
@@ -1788,7 +1788,7 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:50:20+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:50:38+08:00">
                 2018-02-01
               </time>
             
@@ -1807,8 +1807,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
+                  <a href="/categories/高并发缓存/" itemprop="url" rel="index">
+                    <span itemprop="name">高并发缓存</span>
                   </a>
                 </span>
 
@@ -1845,19 +1845,14 @@
 
       
         
-          <p>主要涉及以下几点：</p>
+          <h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>我们在用缓存的时候，不管是Redis或者Memcached，基本上会通用遇到以下三个问题：</p>
 <ul>
-<li>HashMap的数据结构</li>
-<li>HashMap涉及的细节讨论</li>
-<li>HashMap中的一些注意事项</li>
-</ul>
-<h5 id="一、HashMap数据结构"><a href="#一、HashMap数据结构" class="headerlink" title="一、HashMap数据结构"></a>一、HashMap数据结构</h5><p>HashMap的数据结构是由数组+链表组成</p>
-<p><strong>数组</strong>：采用一段连续的存储单元来存储数据。对于指定下标的查找，时间复杂度为O(1)；通过给定值查找，需要遍历数据的元素进行逐一对比，时间复杂度为O(n)</p>
-<p><strong>链表</strong>：对于链表的新增、删除操作（在找到指定位置后），仅需处理节点间的引用即可，时间复杂度为O(1)，而查找操作需要遍历链表进行逐一比对，时间复杂度为O(n)</p>
-<p>所以为了快速定位并且能够快速的增删，使用了数组+链表的方式<br>
+<li>缓存穿透</li>
+<li>缓存并发</li>
+<li>缓存失效
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/02/01/手撕HashMap/#more" rel="contents">
+            <a class="btn" href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
