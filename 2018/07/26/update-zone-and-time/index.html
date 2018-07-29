@@ -85,7 +85,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="redis," />
+  <meta name="keywords" content="Linux," />
 
 
 
@@ -101,20 +101,18 @@
 
 
 
-<meta name="description" content="关于RDB持久化有以下几点：  如何配置RDB持久化 RDB持久化机制的工作流程 基于RDB持久化机制数据恢复的实验  一、如何配置RDB持久化RDB持久化的配置在/etct/redis/6379.conf文件中，之前文章有讲到Linux中安装redis及开发和生产启动redis。6379.conf文件中默认会有几种配置方式：">
-<meta name="keywords" content="redis">
+<meta name="description" content="查看和修改时区 使用命令date -R查看时区  使用命令tzselect修改时区，这时系统会让你选择洲、国家、城市  选择完成之后复制相应的时区文件，替换系统时区文件 1234cp /usr/share/zoneinfo/$主时区/$次时区 /etc/localtime比如我修改的是北京时间cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime">
+<meta name="keywords" content="Linux">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis的RDB持久化配置">
-<meta property="og:url" content="http://yoursite.com/2018/02/01/Redis的RDB持久化配置/index.html">
+<meta property="og:title" content="Linux中修改时区和时间的方法">
+<meta property="og:url" content="http://yoursite.com/2018/07/26/update-zone-and-time/index.html">
 <meta property="og:site_name" content="眺望远方">
-<meta property="og:description" content="关于RDB持久化有以下几点：  如何配置RDB持久化 RDB持久化机制的工作流程 基于RDB持久化机制数据恢复的实验  一、如何配置RDB持久化RDB持久化的配置在/etct/redis/6379.conf文件中，之前文章有讲到Linux中安装redis及开发和生产启动redis。6379.conf文件中默认会有几种配置方式：">
+<meta property="og:description" content="查看和修改时区 使用命令date -R查看时区  使用命令tzselect修改时区，这时系统会让你选择洲、国家、城市  选择完成之后复制相应的时区文件，替换系统时区文件 1234cp /usr/share/zoneinfo/$主时区/$次时区 /etc/localtime比如我修改的是北京时间cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://github.com/a511480568/image/blob/master/RDB%E6%8C%81%E4%B9%85%E5%8C%96%E9%85%8D%E7%BD%AE1.jpg?raw=true">
-<meta property="og:updated_time" content="2018-02-01T12:51:15.286Z">
+<meta property="og:updated_time" content="2018-07-28T03:17:37.159Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Redis的RDB持久化配置">
-<meta name="twitter:description" content="关于RDB持久化有以下几点：  如何配置RDB持久化 RDB持久化机制的工作流程 基于RDB持久化机制数据恢复的实验  一、如何配置RDB持久化RDB持久化的配置在/etct/redis/6379.conf文件中，之前文章有讲到Linux中安装redis及开发和生产启动redis。6379.conf文件中默认会有几种配置方式：">
-<meta name="twitter:image" content="https://github.com/a511480568/image/blob/master/RDB%E6%8C%81%E4%B9%85%E5%8C%96%E9%85%8D%E7%BD%AE1.jpg?raw=true">
+<meta name="twitter:title" content="Linux中修改时区和时间的方法">
+<meta name="twitter:description" content="查看和修改时区 使用命令date -R查看时区  使用命令tzselect修改时区，这时系统会让你选择洲、国家、城市  选择完成之后复制相应的时区文件，替换系统时区文件 1234cp /usr/share/zoneinfo/$主时区/$次时区 /etc/localtime比如我修改的是北京时间cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime">
 
 
 
@@ -143,13 +141,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/02/01/Redis的RDB持久化配置/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/07/26/update-zone-and-time/"/>
 
 
 
 
 
-  <title>Redis的RDB持久化配置 | 眺望远方</title>
+  <title>Linux中修改时区和时间的方法 | 眺望远方</title>
   
 
 
@@ -272,7 +270,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/01/Redis的RDB持久化配置/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/26/update-zone-and-time/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yashon">
@@ -289,7 +287,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Redis的RDB持久化配置</h1>
+          <h1 class="post-title" itemprop="name headline">Linux中修改时区和时间的方法</h1>
         
 
         <div class="post-meta">
@@ -301,8 +299,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T20:45:35+08:00">
-                2018-02-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-26T11:30:08+08:00">
+                2018-07-26
               </time>
             
 
@@ -317,8 +315,8 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-02-01T20:51:15+08:00">
-                2018-02-01
+              <time title="更新于" itemprop="dateModified" datetime="2018-07-28T11:17:37+08:00">
+                2018-07-28
               </time>
             
           </span>
@@ -336,8 +334,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/高并发缓存/" itemprop="url" rel="index">
-                    <span itemprop="name">高并发缓存</span>
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
                   </a>
                 </span>
 
@@ -373,43 +371,25 @@
       
 
       
-        <p>关于RDB持久化有以下几点：</p>
-<ul>
-<li>如何配置RDB持久化</li>
-<li>RDB持久化机制的工作流程</li>
-<li>基于RDB持久化机制数据恢复的实验</li>
-</ul>
-<h5 id="一、如何配置RDB持久化"><a href="#一、如何配置RDB持久化" class="headerlink" title="一、如何配置RDB持久化"></a>一、如何配置RDB持久化</h5><p>RDB持久化的配置在/etct/redis/6379.conf文件中，之前文章有讲到<a href="http://176.122.175.92:2368/linuxzhong-an-zhuang-redis/" target="_blank" rel="noopener">Linux中安装redis及开发和生产启动redis</a>。6379.conf文件中默认会有几种配置方式：<br><a id="more"></a></p>
-<blockquote>
-<p>save 900 1</p>
-<p>save 300 10</p>
-<p>save 60 10000</p>
-</blockquote>
-<p>意思是：每900s有一个key发生了变更，那么就会生成一个新的dump.rdb文件，就是当前redis内存中完整的数据快照；save可以设置多个，就是多个snapshotting检查点，每到一个检查点就会check一下，是否有指定的key发生了变更，如果有就会生成一份新的dump.rdb文件来覆盖之前旧的文件</p>
-<h5 id="二、RDB持久化机制工作流程"><a href="#二、RDB持久化机制工作流程" class="headerlink" title="二、RDB持久化机制工作流程"></a>二、RDB持久化机制工作流程</h5><ol>
-<li>redis根据配置自己去尝试生成rdb快照文件</li>
-<li>fork一个子进程出来</li>
-<li>子进程尝试将数据dump到临时的rdb文件中</li>
-<li>完成rdb快照文件的生成后，就替换之前的老文件</li>
-</ol>
-<h5 id="三、数据恢复实验"><a href="#三、数据恢复实验" class="headerlink" title="三、数据恢复实验"></a>三、数据恢复实验</h5><ul>
-<li>首先在redis中保存几条数据，然后停掉redis进程（redis-cli SHUTDOWN 正常停止），然后重启redis，发现数据仍然存在<blockquote>
-<p>正常退出redis其实是一种安全退出模式，redis在退出时会立即生成一份快照文件保存在/var/redis/6379/dump.rdb中</p>
-</blockquote>
+        <h3 id="查看和修改时区"><a href="#查看和修改时区" class="headerlink" title="查看和修改时区"></a>查看和修改时区</h3><ul>
+<li><p>使用命令date -R查看时区</p>
+</li>
+<li><p>使用命令tzselect修改时区，这时系统会让你选择洲、国家、城市</p>
+</li>
+<li><p>选择完成之后复制相应的时区文件，替换系统时区文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/share/zoneinfo/$主时区/$次时区 /etc/localtime</span><br><span class="line"></span><br><span class="line">比如我修改的是北京时间</span><br><span class="line">cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>操作图如下：<br><img src="https://github.com/a511480568/image/blob/master/RDB%E6%8C%81%E4%B9%85%E5%8C%96%E9%85%8D%E7%BD%AE1.jpg?raw=true" alt="RDB持久化配置正常停止"></p>
-<ul>
-<li><p>在redis中再保存几条数据，使用kill-9粗暴杀掉进程，然后再重新启动redis查看，数据没有保存，操作方式和上图一样，只不过关闭redis进程的方式不一样（此处使用kill-9 杀掉进程，启动redis之前，还需要删除/var/run/redis_6379.pid文件，否则会报错）</p>
+<h3 id="查看和修改时间"><a href="#查看和修改时间" class="headerlink" title="查看和修改时间"></a>查看和修改时间</h3><ul>
+<li><p>使用date命令查看Linux上的系统时间</p>
 </li>
-<li><p>手动在6379.conf文件中设置一个save 5 1</p>
+<li><p>使用命令 date -s 修改时间，可以只修改日期，也可以只修改时间，如果两者都要修改 格式为：date -s “2018-07-26 11:20:00”</p>
 </li>
-<li><p>写入几条数据，等待5s，然后查看dump.rdb文件会发现你之前set的值会进行保存</p>
+<li><p>修改完成之后需要的话可以输入:clock -w  把系统时间写入CMOS</p>
 </li>
-<li><p>然后再粗暴杀掉redis进程，重启redis，get取出之前的key会发现能够正常取出</p>
+<li><p>使用命令hwclock -w 将当前时间和日期写入BIOS，避免重启后失效</p>
 </li>
 </ul>
-<p>以上就是redis中RDB持久化方式的配置以及简单实验</p>
 
       
     </div>
@@ -427,7 +407,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/redis/" rel="tag"># redis</a>
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
           
         </div>
       
@@ -440,8 +420,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/02/01/redis主从架构搭建（一主一从）/" rel="next" title="redis主从架构搭建（一主一从）">
-                <i class="fa fa-chevron-left"></i> redis主从架构搭建（一主一从）
+              <a href="/2018/07/21/changeMysqlConnections/" rel="next" title="Centos7中解决MySQL连接数设置问题">
+                <i class="fa fa-chevron-left"></i> Centos7中解决MySQL连接数设置问题
               </a>
             
           </div>
@@ -449,10 +429,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/02/01/缓存穿透、缓存并发、热点缓存之最佳招式/" rel="prev" title="缓存穿透、缓存并发、热点缓存之最佳招式">
-                缓存穿透、缓存并发、热点缓存之最佳招式 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -586,7 +562,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#一、如何配置RDB持久化"><span class="nav-number">1.</span> <span class="nav-text">一、如何配置RDB持久化</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#二、RDB持久化机制工作流程"><span class="nav-number">2.</span> <span class="nav-text">二、RDB持久化机制工作流程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#三、数据恢复实验"><span class="nav-number">3.</span> <span class="nav-text">三、数据恢复实验</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看和修改时区"><span class="nav-number">1.</span> <span class="nav-text">查看和修改时区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看和修改时间"><span class="nav-number">2.</span> <span class="nav-text">查看和修改时间</span></a></li></ol></div>
             
 
           </div>
