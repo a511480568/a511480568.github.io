@@ -267,6 +267,807 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/22/Redis数据结构之列表/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yashon">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/timg.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="眺望远方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/22/Redis数据结构之列表/" itemprop="url">Redis数据结构之列表相关命令</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-22T20:51:35+08:00">
+                2018-08-22
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-08-22T21:47:54+08:00">
+                2018-08-22
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这篇文章主要介绍的是Redis五大数据结构中的列表常用的相关的命令</p>
+<h3 id="一些常用的列表命令"><a href="#一些常用的列表命令" class="headerlink" title="一些常用的列表命令"></a>一些常用的列表命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RPUSH</td>
+<td style="text-align:left">RPUSH key-name value [value…] 将一个或多个值推入列表的右端</td>
+</tr>
+<tr>
+<td>LPUSH</td>
+<td style="text-align:left">LPUSH key-name value [value…] 将一个或多个值推入列表的左端</td>
+</tr>
+<tr>
+<td>RPOP</td>
+<td style="text-align:left">RPOP key-name 移除并返回列表最右端的元素</td>
+</tr>
+<tr>
+<td>LPOP</td>
+<td style="text-align:left">LPOP key-name 移除并返回列表最左端的元素</td>
+</tr>
+<tr>
+<td>LINDEX</td>
+<td style="text-align:left">LINDEX key-name offset 返回列表元素中偏移量为offset的元素</td>
+</tr>
+<tr>
+<td>LRANGE</td>
+<td style="text-align:left">LRANGE key-name start end 返回列表元素中偏移量start到偏移量end的元素，其中包括start和end在内</td>
+</tr>
+<tr>
+<td>LTRIM</td>
+<td style="text-align:left">LTRIM key-name start end 对列表进行修剪，只保留start和end之间的数据，其中start和end的界值也会保留</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; lpush list-key value1</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; lpush list-key value2 value3</span><br><span class="line">(integer) 3</span><br><span class="line">127.0.0.1:6379&gt; lrange list-key 0 -1</span><br><span class="line">1) &quot;value3&quot;</span><br><span class="line">2) &quot;value2&quot;</span><br><span class="line">3) &quot;value1&quot;</span><br><span class="line">127.0.0.1:6379&gt; rpush list-key value4 value5</span><br><span class="line">(integer) 5</span><br><span class="line">127.0.0.1:6379&gt; lrange list-key 0 -1</span><br><span class="line">1) &quot;value3&quot;</span><br><span class="line">2) &quot;value2&quot;</span><br><span class="line">3) &quot;value1&quot;</span><br><span class="line">4) &quot;value4&quot;</span><br><span class="line">5) &quot;value5&quot;</span><br><span class="line">127.0.0.1:6379&gt; rpop list-key</span><br><span class="line">&quot;value5&quot;</span><br><span class="line">127.0.0.1:6379&gt; lrange list-key 0 -1</span><br><span class="line">1) &quot;value3&quot;</span><br><span class="line">2) &quot;value2&quot;</span><br><span class="line">3) &quot;value1&quot;</span><br><span class="line">4) &quot;value4&quot;</span><br><span class="line">127.0.0.1:6379&gt; lpop list-key</span><br><span class="line">&quot;value3&quot;</span><br><span class="line">127.0.0.1:6379&gt; lrange list-key 0 -1</span><br><span class="line">1) &quot;value2&quot;</span><br><span class="line">2) &quot;value1&quot;</span><br><span class="line">3) &quot;value4&quot;</span><br><span class="line">127.0.0.1:6379&gt; lindex list-key 1</span><br><span class="line">&quot;value1&quot;</span><br><span class="line">127.0.0.1:6379&gt; lindex list-key 5</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; ltrim list-key 0 1</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; lrange list-key 0 -1</span><br><span class="line">1) &quot;value2&quot;</span><br><span class="line">2) &quot;value1&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="阻塞式的列表弹出命令以及在列表之间移动元素的命令"><a href="#阻塞式的列表弹出命令以及在列表之间移动元素的命令" class="headerlink" title="阻塞式的列表弹出命令以及在列表之间移动元素的命令"></a>阻塞式的列表弹出命令以及在列表之间移动元素的命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BLPOP</td>
+<td style="text-align:left">BLPOP key-name [key-name…] timeout 从第一个非空列表中弹出位于最左端的元素，或者在timeout秒之内阻塞并等待可弹出的元素出现</td>
+</tr>
+<tr>
+<td>BRPOP</td>
+<td style="text-align:left">BRPOP key-name [key-name…] timeout 从第一个非空列表中弹出位于最右端的元素，或者在timeout秒之内阻塞并等待可弹出的元素出现</td>
+</tr>
+<tr>
+<td>RPOPLPUSH</td>
+<td style="text-align:left">RPOPLPUSH source-key dest-key 从source-key列表中弹出最右端的元素，然后推入dest-key的最左端，并返回这个元素</td>
+</tr>
+<tr>
+<td>BRPOPLPUSH</td>
+<td style="text-align:left">BRPOPLPUSH source-key dest-key timeout 从source-key列表中弹出最右端的元素，然后推入dest-key的最左端，并返回这个元素，如果source-key位空，那么会在timeout秒之内阻塞并等待可弹出的元素出现</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">27.0.0.1:6379&gt; blpop list-key1 list-key2 3</span><br><span class="line">(nil)</span><br><span class="line">(3.10s)</span><br><span class="line">127.0.0.1:6379&gt; lpush list-key2 aa bb</span><br><span class="line">(integer) 2</span><br><span class="line">127.0.0.1:6379&gt; blpop list-key1 list-key2 3</span><br><span class="line">1) &quot;list-key2&quot;</span><br><span class="line">2) &quot;bb&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; rpoplpush list-key2 list-key3</span><br><span class="line">&quot;aa&quot;</span><br><span class="line">127.0.0.1:6379&gt; lrange list-key2 0 -1</span><br><span class="line">(empty list or set)</span><br><span class="line">127.0.0.1:6379&gt; lrange list-key3 0 -1</span><br><span class="line">1) &quot;aa&quot;</span><br></pre></td></tr></table></figure>
+<p>由上所述，我们可以看出使用这几个命令可以实现简单的消息队列。</p>
+<h3 id="问题点"><a href="#问题点" class="headerlink" title="问题点"></a>问题点</h3><p>我们知道Redis是单线程服务，而上述的命令BLPOP等是有阻塞时间的，当key-name中没有元素的时候会进行阻塞，如果阻塞客户端一直保持着跟服务器的链接，会不会阻塞其他命令的执行呢？</p>
+<blockquote>
+<p>答案是不会的。这就涉及到redis阻塞命令的实现原理。我们知道，在redis server中有两个循环：IO循环和定时事件。在IO循环中，redis完成客户端连接应答、命令请求处理和命令处理结果回复等，在定时循环中，redis完成过期key的检测等。redis一次连接处理的过程包含几个重要的步骤：IO多路复用检测套接字状态，套接字事件分派和请求事件处理。</p>
+<p>redis在blpop命令处理过程时，首先会去查找key对应的list，如果存在，则pop出数据响应给客户端。否则将对应的key push到blocking_keys数据结构当中，对应的value是被阻塞的client。当下次push命令发出时，服务器检查blocking_keys当中是否存在对应的key，如果存在，则将key添加到ready_keys链表当中，同时将value插入链表当中并响应客户端。</p>
+<p>服务端在每次的事件循环当中处理完客户端请求之后，会遍历ready_keys链表，并从blocking_keys链表当中找到对应的client，进行响应，整个过程并不会阻塞事件循环的执行。所以， 总的来说，redis server是通过ready_keys和blocking_keys两个链表和事件循环来处理阻塞事件的。</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/22/Redis数据结构之字符串/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yashon">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/timg.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="眺望远方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/22/Redis数据结构之字符串/" itemprop="url">Redis数据结构之字符串相关命令</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-22T20:50:35+08:00">
+                2018-08-22
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-08-22T21:47:29+08:00">
+                2018-08-22
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这篇文章主要介绍的是Redis五大数据结构中的字符串常用的相关的命令</p>
+<h3 id="字符串之自增和自减"><a href="#字符串之自增和自减" class="headerlink" title="字符串之自增和自减"></a>字符串之自增和自减</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INCR</td>
+<td style="text-align:left">INCR key-name 将键存储的值加上1</td>
+</tr>
+<tr>
+<td>DECR</td>
+<td style="text-align:left">DECR key-name 将键存储的值减1</td>
+</tr>
+<tr>
+<td>INCRBY</td>
+<td style="text-align:left">INCRBY key-name amount 将键存储的值加上整数amount</td>
+</tr>
+<tr>
+<td>DECRBY</td>
+<td style="text-align:left">DECRBY key-name amount 将键存储的值减去整数amount</td>
+</tr>
+<tr>
+<td>INCRBYFLOAT</td>
+<td style="text-align:left">INCRBYFLOAT key-name amount 将键存储的值加上浮点数amount</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446ly1fuhr8dwpk1j20m00qs7ck.jpg" alt=""></p>
+<p>看到上图的几个命令可以看出即使value是字符串形式的数字，只要这个值可以被Redis解释成十进制整数或者浮点数的话就可以进行自增或者自减操作;如果输入的value无法被Redis解释成数字的话，进行自增或者自减就会出现错误。</p>
+<h3 id="字符串子串和二进制位"><a href="#字符串子串和二进制位" class="headerlink" title="字符串子串和二进制位"></a>字符串子串和二进制位</h3><p>除了自增或者自减操作，Redis还可以对字符串的其中一部分内容进行读取或者写入操作</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>APPEND</td>
+<td style="text-align:left">APPEND key-name value 将value追加到给定键key-name当前存储值的末尾</td>
+</tr>
+<tr>
+<td>GETRANGE</td>
+<td style="text-align:left">GETRANGE key-name start end 获取一个由偏移量start到偏移量end范围内所有字符组成的子串，包括start和end在内</td>
+</tr>
+<tr>
+<td>SETRANGE</td>
+<td style="text-align:left">SETRANGE key-name start value 将从start开始的子串设置为给定值</td>
+</tr>
+<tr>
+<td>GETBIT</td>
+<td style="text-align:left">GETBIT key-name offset 将字符串看成是二进制位串，并返回位串中偏移量为offset的二进制位的值</td>
+</tr>
+<tr>
+<td>SETBIT</td>
+<td style="text-align:left">SETBIT key-name offset value 将字符串看成是二进制位串，并将位串中偏移量为offset的二进制的值设置为value</td>
+</tr>
+<tr>
+<td>BITCOUNT</td>
+<td style="text-align:left">BITCOUNT key-name [start end] 统计二进制位串中面值为1的二进制位的数据，如果给定了start end范围，那么只计算该范围内的二进制位的数量</td>
+</tr>
+<tr>
+<td>BITOP</td>
+<td style="text-align:left">BITOP operation dest-key key-name [key-name …] 对一个或多个二进制位串进行包括并（AND）、或(OR)、异或(XOR)、非(NOT)在内的任意一种按位运算操作，并将计算得出的结果存放在dest-key里面</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446ly1fuhsa9armzj20rg0sgqei.jpg" alt="getrange和setrange"></p>
+<p>关于GETRANGE和SETRANGE两个命令需要说明的是</p>
+<ul>
+<li>GETRANGE对字符串进行操作的时候，字符串从左到右是整数索引，从0开始，从右到左是负数作为，从-1开始，不支持回绕操作（就是 GETRANGE newstringkey -1 -15）,具体看下图：</li>
+</ul>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446ly1fuhse0jz4xj20g20d441e.jpg" alt="字符串索引"></p>
+<ul>
+<li>SETRANGE如果这个key没有值，那么在设置start位置的时候，如果不是从0开始，那么前面的位置是需要补0的，如：SETRANGE newstringkey2 3 “this is new key and value”</li>
+</ul>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446gy1fuia8qj7kbj20o00fc78t.jpg" alt="set比特命令"></p>
+<p>我们知道 ‘a’ 的ASCII码是  97。转换为二进制是：01100001，setbit命令是对offset位置的值进行修改，比方说我们需要把’a’改成’b’，那么二进制是：01100010，我们需要将第六位设置为1，第七位设置为0，具体命令可以参考上图，最后使用get命令可以看到结果为’b’。</p>
+<p><strong>关于SETBIT和BITCOUNT的使用：可以用来计算用户上线的次数，使用用户名:id来作为key，用网站上线的日期到用户上线的日期作为offset，然后将这个值设置为1,SETBIT user:id offset 1,最后用GETBIT user:id来统计这个用户总共上线了多少次。</strong></p>
+<p><strong>关于BITOP命令需要注意的是两个value是做的位运算！当BITOP处理不同长度的字符串时，较短的那个字符串所缺少的部分会被看做0,空的key也被看作是包含0的字符串序列</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set key1 &quot;footbar&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set key2 &quot;abcd&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; bitop and dest-and key1 key2</span><br><span class="line">(integer) 7</span><br><span class="line">127.0.0.1:6379&gt; get dest-and</span><br><span class="line">&quot;`bcd\x00\x00\x00&quot;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/22/Redis数据结构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yashon">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/timg.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="眺望远方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/22/Redis数据结构/" itemprop="url">Redis数据结构</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-22T20:45:35+08:00">
+                2018-08-22
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-08-22T21:46:48+08:00">
+                2018-08-22
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Redis数据结构"><a href="#Redis数据结构" class="headerlink" title="Redis数据结构"></a>Redis数据结构</h2><p>Redis分为五种数据结构</p>
+<table>
+<thead>
+<tr>
+<th>结构类型</th>
+<th style="text-align:center">结构存储的值</th>
+<th style="text-align:right">结构的读写能力 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STRING</td>
+<td style="text-align:center">可以是字符串、整数、浮点数</td>
+<td style="text-align:right">对整个字符串或者字符串其中的一部分进行操作；对证书或者浮点数进行自增或者自减的操作 </td>
+</tr>
+<tr>
+<td>LIST</td>
+<td style="text-align:center">一个链表，每个链表的节点都包含了一个字符串</td>
+<td style="text-align:right">从链表的两端推入或者弹出元素；根据偏移量对链表进行修剪；读取单个或者多个元素；根据值查找或者移除元素 </td>
+</tr>
+<tr>
+<td>SET</td>
+<td style="text-align:center">包含字符串的无序收集器，并且包含的每个字符串都是独一无二各不相同的</td>
+<td style="text-align:right">添加、获取、移除单个元素；检查一个元素是否存在于集合中；计算交集、并集、差集；从集合中随机获取元素</td>
+</tr>
+<tr>
+<td>HASH</td>
+<td style="text-align:center">包含键值对的无序散列表</td>
+<td style="text-align:right">添加、获取、移除单个键值对；获取整个键值对</td>
+</tr>
+<tr>
+<td>ZSET</td>
+<td style="text-align:center">字符串成员与浮点数分值之间的有序映射，元素的排列顺序有分值大小决定</td>
+<td style="text-align:right">添加、获取、移除单个元素；根据分值范围或者成员来获取元素</td>
+</tr>
+</tbody>
+</table>
+<h3 id="STRING简单操作"><a href="#STRING简单操作" class="headerlink" title="STRING简单操作"></a>STRING简单操作</h3><p>简单的几个命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SET</td>
+<td style="text-align:left">设置存储给定键的值</td>
+</tr>
+<tr>
+<td>GET</td>
+<td style="text-align:left">获取存储给定键的值</td>
+</tr>
+<tr>
+<td>DEL</td>
+<td style="text-align:left">删除存储给定键的值</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446gy1fubq0w05foj20fe0aodik.jpg" alt="STRING操作命令"></p>
+<h3 id="LIST简单操作"><a href="#LIST简单操作" class="headerlink" title="LIST简单操作"></a>LIST简单操作</h3><p>简单的几个命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RPUSH</td>
+<td style="text-align:left">将给定的值推入列表的右端</td>
+</tr>
+<tr>
+<td>LPUSH</td>
+<td style="text-align:left">将给定的值推入列表的左端</td>
+</tr>
+<tr>
+<td>LPOP</td>
+<td style="text-align:left">从列表的左端弹出一个值，返回这个被弹出的值（弹出后这个值就不存在于这个列表）</td>
+</tr>
+<tr>
+<td>RPOP</td>
+<td style="text-align:left">从列表的右端弹出一个值，返回这个被弹出的值（弹出后这个值就不存在于这个列表）</td>
+</tr>
+<tr>
+<td>LRANGE</td>
+<td style="text-align:left">获取列表在给定范围内的值</td>
+</tr>
+<tr>
+<td>LINDEX</td>
+<td style="text-align:left">获取给定位置的值</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446gy1fubq8s02raj20ga0hyn1z.jpg" alt="LIST命令列表"></p>
+<h3 id="集合简单操作"><a href="#集合简单操作" class="headerlink" title="集合简单操作"></a>集合简单操作</h3><p>简单的几个命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SADD</td>
+<td style="text-align:left">将给定元素添加到集合</td>
+</tr>
+<tr>
+<td>SMEMBERS</td>
+<td style="text-align:left">返回给定集合中包含的所有元素</td>
+</tr>
+<tr>
+<td>SISMEMBER</td>
+<td style="text-align:left">检查给定的元素是否存在于集合中</td>
+</tr>
+<tr>
+<td>SREM</td>
+<td style="text-align:left">如果给定的元素存在于集合中，就删除这个元素</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Redis集合和列表都可以存储多个字符串，他们的不同在于，列表可以存储多个相同的字符串，而集合通过散列表来保证自己存储的每个字符串都不相同</strong></p>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446gy1fubrm0d0iij20g20jgwk1.jpg" alt="set集合命令"></p>
+<h3 id="散列集合"><a href="#散列集合" class="headerlink" title="散列集合"></a>散列集合</h3><p>简单的几个命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HSET</td>
+<td style="text-align:left">在散列里面关联起给定的键值对</td>
+</tr>
+<tr>
+<td>HGET</td>
+<td style="text-align:left">获取指定散列的值</td>
+</tr>
+<tr>
+<td>HGETALL</td>
+<td style="text-align:left">获取散列包含的所有键值对</td>
+</tr>
+<tr>
+<td>HDEL</td>
+<td style="text-align:left">如果给定键存在于散列里面，那么移除这个键</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446gy1fubrx0ex7gj20jw0j6grd.jpg" alt="散列集合命令"></p>
+<h3 id="有序集合"><a href="#有序集合" class="headerlink" title="有序集合"></a>有序集合</h3><p><strong>有序集合和散列一样都是用于存储键值对，有序集合的键被称为成员，每个成员都是各不相同的；有序集合的值被称为分值，分值必须为浮点数</strong></p>
+<p>简单的几个命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th style="text-align:left">行为 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ZADD</td>
+<td style="text-align:left">将一个带有分值的成员添加到有序集合中</td>
+</tr>
+<tr>
+<td>ZRANGE</td>
+<td style="text-align:left">根据元素在有序排列中所处的位置，从有序集合里面获取多个元素</td>
+</tr>
+<tr>
+<td>ZRANGEBYSCORE</td>
+<td style="text-align:left">获取有序集合在给定分值范围内的所有元素</td>
+</tr>
+<tr>
+<td>ZREM</td>
+<td style="text-align:left">如果指定元素存在于有序集合中，那么移除这个元素</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://ws1.sinaimg.cn/large/7ebba446ly1fubvo9zm6gj20mm0t2wmw.jpg" alt="有序集合命令"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/06/select2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1389,496 +2190,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/13/HotSpot虚拟机垃圾收集器/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yashon">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/timg.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="眺望远方">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/13/HotSpot虚拟机垃圾收集器/" itemprop="url">HotSpot垃圾收集器</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-13T16:38:59+08:00">
-                2018-03-13
-              </time>
-            
-
-            
-              <span class="post-meta-divider">|</span>
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2018-03-13T21:14:16+08:00">
-                2018-03-13
-              </time>
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jvm/" itemprop="url" rel="index">
-                    <span itemprop="name">jvm</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><img src="https://github.com/a511480568/image/blob/master/hotspotjvm.jpg?raw=true" alt="HotSpot垃圾收集器"><br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/03/13/HotSpot虚拟机垃圾收集器/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/07/适配器模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yashon">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/timg.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="眺望远方">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/07/适配器模式/" itemprop="url">java设计模式之适配器模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-07T10:58:59+08:00">
-                2018-03-07
-              </time>
-            
-
-            
-              <span class="post-meta-divider">|</span>
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2018-03-07T21:18:19+08:00">
-                2018-03-07
-              </time>
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>将一个类的接口变为客户端所期望的另外一种接口，从而使原本接口不匹配而无法工作的两个类能够在一起中作。</p>
-<p>适配器分为：类适配器和对象适配器和缺省适配器。</p>
-<h4 id="类适配器"><a href="#类适配器" class="headerlink" title="类适配器"></a>类适配器</h4><p>类的适配器把适配类的API转换为目标类的API</p>
-<p><img src="https://github.com/a511480568/image/blob/master/classAdaptee.png?raw=true" alt="classAdapteeUML"></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/03/07/适配器模式/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/04/Java内存回收/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yashon">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/timg.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="眺望远方">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/04/Java内存回收/" itemprop="url">jvm虚拟机内存</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-04T20:58:59+08:00">
-                2018-03-04
-              </time>
-            
-
-            
-              <span class="post-meta-divider">|</span>
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2018-03-06T22:01:39+08:00">
-                2018-03-06
-              </time>
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jvm/" itemprop="url" rel="index">
-                    <span itemprop="name">jvm</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>这篇Java内存回收主要是围绕周志明老师的三个问题点做笔记：</p>
-<ol>
-<li><p>哪些内存需要回收</p>
-</li>
-<li><p>如何回收</p>
-</li>
-<li><p>什么时候回收</p>
-</li>
-</ol>
-<h2 id="哪些内存需要回收"><a href="#哪些内存需要回收" class="headerlink" title="哪些内存需要回收"></a>哪些内存需要回收</h2><p>这个问题其实就是判定哪些对象为垃圾对象，主要介绍两种判定对象为垃圾对象的方法：</p>
-<ul>
-<li><p>引用计数法</p>
-</li>
-<li><p>可达性分析</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/03/04/Java内存回收/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1929,7 +2240,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/">
-                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-count">34</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1940,7 +2251,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
